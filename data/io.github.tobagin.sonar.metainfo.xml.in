@@ -65,11 +65,12 @@
   <developer_name>Thiago Fernandes</developer_name>
   <update_contact>tobagin@example.com</update_contact>
   <content_rating type="oars-1.1" />
+  <launchable type="desktop-id">@APP_ID@.desktop</launchable>
   <releases>
     <release version="2.0.0" date="2025-08-25">
       <description>
         <p>🚀 Major Release: Complete Architecture Rewrite</p>
-        <p><strong>BREAKING CHANGE:</strong> Complete migration from Python to Vala</p>
+        <p>BREAKING CHANGE: Complete migration from Python to Vala</p>
         <p>This major release represents a complete rewrite of Sonar, transitioning from a Python-based application to a native Vala application with significant performance improvements and new features.</p>
         <p>🔧 Core Changes:</p>
         <ul>
