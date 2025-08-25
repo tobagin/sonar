@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/@APP_PATH@">
+    <file>main_window.ui</file>
+    <file>request_row.ui</file>
+    <file>preferences.ui</file>
+    <file>shortcuts_dialog.ui</file>
+    <file>statistics_dialog.ui</file>
+  </gresource>
+</gresources>

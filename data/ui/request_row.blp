@@ -1,7 +1,7 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $RequestRow : Adw.ExpanderRow {
+template $SonarRequestRow : Adw.ExpanderRow {
   title: bind template.method_path;
   subtitle: bind template.timestamp_text;
   
@@ -113,7 +113,7 @@ template $RequestRow : Adw.ExpanderRow {
   }
   
   Gtk.ScrolledWindow {
-    height-request: 400;
+    height-request: 240;
     hscrollbar-policy: automatic;
     vscrollbar-policy: automatic;
     margin-top: 6;

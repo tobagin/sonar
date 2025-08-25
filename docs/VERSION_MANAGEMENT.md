@@ -67,7 +67,7 @@ Other modules and components
   __version__ = "@VERSION@"
   ```
 
-- **`data/io.github.tobagin.sonar.appdata.xml.in`** - Metadata template
+- **`data/io.github.tobagin.sonar.metainfo.xml.in`** - Metadata template
   ```xml
   <release version="@VERSION@" date="@DATE@">
   ```

@@ -1,0 +1,89 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $SonarPreferencesDialog : Adw.PreferencesDialog {
+  title: "Preferences";
+
+  Adw.PreferencesPage {
+    title: "General";
+    icon-name: "applications-system-symbolic";
+
+    Adw.PreferencesGroup {
+      title: "Ngrok Configuration";
+      description: "Configure your ngrok authentication token to enable tunnel features";
+
+      Adw.ActionRow {
+        title: "Auth Token";
+        subtitle: "Get your token from ngrok.com dashboard";
+
+        [suffix]
+        Entry auth_token_entry {
+          placeholder-text: "Paste your ngrok auth token here";
+          input-purpose: password;
+          visibility: false;
+          hexpand: true;
+          valign: center;
+        }
+      }
+
+      Adw.ActionRow {
+        [suffix]
+        Box {
+          orientation: horizontal;
+          spacing: 6;
+
+          Button save_token_button {
+            label: "Save Token";
+            sensitive: false;
+            valign: center;
+
+            styles [
+              "suggested-action"
+            ]
+          }
+
+          Button test_token_button {
+            label: "Test Connection";
+            sensitive: false;
+            valign: center;
+          }
+        }
+      }
+
+      Adw.ActionRow {
+        title: "Status";
+
+        [suffix]
+        Label token_status_label {
+          label: "No token configured";
+          halign: start;
+        }
+      }
+    }
+
+    Adw.PreferencesGroup {
+      title: "Information";
+
+      Adw.ActionRow {
+        title: "Ngrok Version";
+
+        [suffix]
+        Label ngrok_version_label {
+          label: "Not installed";
+          halign: start;
+        }
+      }
+
+      Adw.ActionRow help_row {
+        title: "Get ngrok auth token";
+        subtitle: "Sign up at ngrok.com to get your free auth token";
+        activatable: true;
+
+        [suffix]
+        Image {
+          icon-name: "adw-external-link-symbolic";
+        }
+      }
+    }
+  }
+}

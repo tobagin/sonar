@@ -1,0 +1,162 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $SonarShortcutsDialog : Adw.Dialog {
+  title: _("Keyboard Shortcuts");
+  content-width: 600;
+  content-height: 700;
+  
+  Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {
+      title-widget: Adw.WindowTitle {
+        title: _("Keyboard Shortcuts");
+      };
+    }
+    
+    ScrolledWindow {
+      vexpand: true;
+      
+      Adw.Clamp {
+        maximum-size: 600;
+        
+        Box {
+          orientation: vertical;
+          spacing: 0;
+          margin-top: 24;
+          margin-bottom: 24;
+          margin-start: 12;
+          margin-end: 12;
+          
+          // Application Section
+          Adw.PreferencesGroup {
+            title: _("Application");
+            
+            Adw.ActionRow {
+              title: _("Quit application");
+              
+              [suffix]
+              Label {
+                label: _("Ctrl + Q");
+              }
+            }
+            
+            Adw.ActionRow {
+              title: _("Open preferences");
+              
+              [suffix]
+              Label {
+                label: _("Ctrl + ,");
+              }
+            }
+            
+            Adw.ActionRow {
+              title: _("Show keyboard shortcuts");
+              
+              [suffix]
+              Label {
+                label: _("Ctrl + ?");
+              }
+            }
+            
+            Adw.ActionRow {
+              title: _("Show about dialog");
+              
+              [suffix]
+              Label {
+                label: _("F1");
+              }
+            }
+            
+            Adw.ActionRow {
+              title: _("Toggle fullscreen");
+              
+              [suffix]
+              Label {
+                label: _("F11");
+              }
+            }
+          }
+          
+          // Tunnel Control Section
+          Adw.PreferencesGroup {
+            title: _("Tunnel Control");
+            
+            Adw.ActionRow {
+              title: _("Start/Stop tunnel");
+              
+              [suffix]
+              Label {
+                label: _("Ctrl + T");
+              }
+            }
+            
+            Adw.ActionRow {
+              title: _("Copy public URL");
+              
+              [suffix]
+              Label {
+                label: _("Ctrl + U");
+              }
+            }
+            
+            Adw.ActionRow {
+              title: _("Refresh status");
+              
+              [suffix]
+              Label {
+                label: _("F5");
+              }
+            }
+          }
+          
+          // Request Management Section
+          Adw.PreferencesGroup {
+            title: _("Request Management");
+            
+            Adw.ActionRow {
+              title: _("Clear current requests");
+              
+              [suffix]
+              Label {
+                label: _("Ctrl + L");
+              }
+            }
+            
+            Adw.ActionRow {
+              title: _("View/Hide history");
+              
+              [suffix]
+              Label {
+                label: _("Ctrl + H");
+              }
+            }
+          }
+          
+          // Navigation Section
+          Adw.PreferencesGroup {
+            title: _("Navigation");
+            
+            Adw.ActionRow {
+              title: _("Close dialogs");
+              
+              [suffix]
+              Label {
+                label: _("Escape");
+              }
+            }
+            
+            Adw.ActionRow {
+              title: _("Activate focused button");
+              
+              [suffix]
+              Label {
+                label: _("Enter");
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

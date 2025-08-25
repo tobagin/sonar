@@ -2,5 +2,12 @@
 PRPs/
 .flatpak-builder
 flatpak-build
+build/
 repo
 .pytest_cache
+
+# Generated files
+*.metainfo.xml.configured
+*.appdata.xml.configured
+*.desktop.configured
+*.gschema.xml.compiled

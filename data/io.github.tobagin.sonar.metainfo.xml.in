@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>@APP_ID@</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>@APP_NAME@</name>
+  <summary>Desktop webhook inspector for developers</summary>
+  <description>
+    <p>
+      Sonar is a native GTK4 application that provides a beautiful, intuitive interface 
+      for capturing and inspecting webhook requests during development. Built with modern 
+      technologies and following GNOME design patterns, Sonar makes webhook debugging 
+      simple and efficient.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Instant public URLs via ngrok integration for webhook testing</li>
+      <li>Real-time capture of incoming webhook requests as they arrive</li>
+      <li>Detailed inspection of headers, body content, query parameters, and metadata</li>
+      <li>Quick copy functionality for request data, headers, or body content</li>
+      <li>Clean Libadwaita interface that integrates perfectly with GNOME</li>
+      <li>Fast and lightweight native application with minimal resource usage</li>
+    </ul>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/main-window.png</image>
+      <caption>Main window interface</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/main-window-start-tunnel.png</image>
+      <caption>Starting a tunnel to receive webhooks</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/main-window-tunnel-started.png</image>
+      <caption>Tunnel running and ready to receive requests</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/received-requests.png</image>
+      <caption>Viewing received webhook requests</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/history.png</image>
+      <caption>Request history and details</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/request-statistics.png</image>
+      <caption>Request statistics and analytics</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/preferences.png</image>
+      <caption>Application preferences</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/keyboard-shortcuts.png</image>
+      <caption>Keyboard shortcuts</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/about.png</image>
+      <caption>About dialog</caption>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://github.com/tobagin/sonar</url>
+  <url type="bugtracker">https://github.com/tobagin/sonar/issues</url>
+  <developer_name>Thiago Fernandes</developer_name>
+  <update_contact>tobagin@example.com</update_contact>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="2.0.0" date="2025-08-25">
+      <description>
+        <p>🚀 Major Release: Complete Architecture Rewrite</p>
+        <p><strong>BREAKING CHANGE:</strong> Complete migration from Python to Vala</p>
+        <p>This major release represents a complete rewrite of Sonar, transitioning from a Python-based application to a native Vala application with significant performance improvements and new features.</p>
+        <p>🔧 Core Changes:</p>
+        <ul>
+          <li>Complete rewrite in Vala for dramatically improved performance and startup times</li>
+          <li>Eliminated Python runtime dependency - now a truly native GTK4 application</li>
+          <li>Reduced memory footprint and system resource usage</li>
+          <li>Enhanced stability and reliability through compile-time type checking</li>
+        </ul>
+        <p>🎨 New User Interface Features:</p>
+        <ul>
+          <li>Added comprehensive preferences dialog with advanced configuration options</li>
+          <li>Implemented keyboard shortcuts dialog with customizable key bindings</li>
+          <li>Added detailed request statistics and analytics dashboard</li>
+          <li>Enhanced main window with improved layout and responsiveness</li>
+          <li>Better integration with GNOME desktop environment</li>
+        </ul>
+        <p>⚙️ Technical Improvements:</p>
+        <ul>
+          <li>Migrated to Meson build system for better performance and maintainability</li>
+          <li>Added proper GSettings integration for persistent configuration</li>
+          <li>Improved error handling and user feedback mechanisms</li>
+          <li>Enhanced request processing and display performance</li>
+          <li>Added automated Flatpak packaging with GitHub Actions</li>
+        </ul>
+        <p>📊 New Analytics Features:</p>
+        <ul>
+          <li>Request statistics with detailed breakdowns by method, status code, and timing</li>
+          <li>Real-time performance metrics and monitoring</li>
+          <li>Enhanced request history with filtering and search capabilities</li>
+          <li>Improved data visualization and reporting</li>
+        </ul>
+        <p>Note: Due to the architectural changes, existing configuration and data from v1.x will need to be reconfigured.</p>
+      </description>
+    </release>
+    <release version="@VERSION@" date="2025-01-01">
+      <description>
+        <p>Vala port with improved performance and reduced dependencies.</p>
+      </description>
+    </release>
+  </releases>
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+  <recommends>
+    <control>keyboard</control>
+    <control>pointing</control>
+    <control>touch</control>
+  </recommends>
+</component>

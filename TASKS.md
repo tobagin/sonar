@@ -39,7 +39,7 @@ This file tracks completed development tasks with timestamps and details.
    - **Status: ACCEPTABLE** - Build scripts should provide output for build process feedback
 
 5. **Documentation References:**
-   - Found references to "debugging" in README.md and appdata.xml
+   - Found references to "debugging" in README.md and metainfo.xml
    - These are descriptive text about the application's purpose (webhook debugging)
    - **Status: ACCEPTABLE** - These are not debug statements but feature descriptions
 
@@ -868,7 +868,7 @@ This file tracks completed development tasks with timestamps and details.
    - **`src/__init__.py`**: Changed from hardcoded version to `from ._version import __version__`
    - **`src/server.py`**: Added version import and replaced hardcoded versions with `__version__`
    - **`src/main.py`**: Added version import and replaced hardcoded version in about dialog
-   - **`data/io.github.tobagin.sonar.appdata.xml.in`**: Updated to use `@VERSION@` for current release
+   - **`data/io.github.tobagin.sonar.metainfo.xml.in`**: Updated to use `@VERSION@` for current release
 
 5. **Created Complete Documentation**:
    - **`docs/VERSION_MANAGEMENT.md`**: Comprehensive documentation covering:
@@ -894,7 +894,7 @@ This file tracks completed development tasks with timestamps and details.
 - **Automated Validation**: Scripts catch version inconsistencies automatically
 - **Template Support**: Proper @VERSION@ placeholder usage for build-time substitution
 - **Flatpak Compatible**: Works seamlessly with Flatpak build process
-- **Historical Preservation**: Release history maintained in appdata.xml.in
+- **Historical Preservation**: Release history maintained in metainfo.xml.in
 
 **Benefits:**
 - ✅ **Much Simpler**: Eliminated 393 lines of complex version management code
@@ -916,7 +916,7 @@ This file tracks completed development tasks with timestamps and details.
 - **UPDATED**: `src/__init__.py` - Changed to import from _version.py
 - **UPDATED**: `src/server.py` - Added version import and replaced hardcoded versions
 - **UPDATED**: `src/main.py` - Added version import and replaced hardcoded version
-- **UPDATED**: `data/io.github.tobagin.sonar.appdata.xml.in` - Updated to use @VERSION@
+- **UPDATED**: `data/io.github.tobagin.sonar.metainfo.xml.in` - Updated to use @VERSION@
 - **UPDATED**: `meson.build` - Fixed meson_version requirement
 - **NEW**: `scripts/test_version_consistency.py` - Comprehensive consistency testing
 - **NEW**: `scripts/validate_build_version.py` - Build-time version validation

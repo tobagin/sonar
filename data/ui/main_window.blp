@@ -1,7 +1,7 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $SonarWindow : Adw.ApplicationWindow {
+template $SonarMainWindow : Adw.ApplicationWindow {
   default-width: 800;
   default-height: 600;
   
@@ -108,8 +108,7 @@ template $SonarWindow : Adw.ApplicationWindow {
                 }
                 
                 Gtk.Button stop_tunnel_button {
-                  icon-name: "network-offline-symbolic";
-                  tooltip-text: _("Stop Tunnel");
+                  label: _("Stop Tunnel");
                   visible: false;
                   
                   styles ["pill", "destructive-action"]
@@ -286,11 +285,6 @@ menu primary_menu {
       label: _("_Preferences");
       action: "app.preferences";
     }
-    
-    item {
-      label: _("_About Sonar");
-      action: "app.about";
-    }
   }
   
   section {
@@ -316,48 +310,14 @@ menu primary_menu {
   }
   
   section {
-    submenu {
+    item {
       label: _("_Keyboard Shortcuts");
-      
-      item {
-        label: _("Quit");
-        action: "app.quit";
-      }
-      
-      item {
-        label: _("Preferences");
-        action: "app.preferences";
-      }
-      
-      item {
-        label: _("Copy URL");
-        action: "app.copy-url";
-      }
-      
-      item {
-        label: _("Toggle Tunnel");
-        action: "app.toggle-tunnel";
-      }
-      
-      item {
-        label: _("Clear Requests");
-        action: "app.clear-requests";
-      }
-      
-      item {
-        label: _("Copy Request");
-        action: "app.copy-request";
-      }
-      
-      item {
-        label: _("Refresh");
-        action: "app.refresh";
-      }
-      
-      item {
-        label: _("Toggle Fullscreen");
-        action: "app.toggle-fullscreen";
-      }
+      action: "win.show-help-overlay";
+    }
+    
+    item {
+      label: _("_About Sonar");
+      action: "app.about";
     }
   }
   

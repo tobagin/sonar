@@ -1,4 +1,4 @@
-app-id: io.github.tobagin.sonar
+app-id: io.github.tobagin.sonar.Devel
 runtime: org.gnome.Platform
 runtime-version: '48'
 sdk: org.gnome.Sdk
@@ -43,8 +43,8 @@ modules:
 
   - name: sonar
     buildsystem: meson
+    config-opts:
+      - -Dprofile=development
     sources:
-      - type: git
-        url: https://github.com/tobagin/Sonar.git
-        tag: v2.0.0
-        commit: 84af13ae7ea9cf284b8c25c1ca2a73c902946da8
+      - type: dir
+        path: ..

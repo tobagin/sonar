@@ -1,0 +1,131 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $SonarStatisticsDialog : Adw.Dialog {
+  title: _("Request Statistics");
+  content-width: 800;
+  content-height: 600;
+  
+  Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {
+      title-widget: Adw.WindowTitle {
+        title: _("Request Statistics");
+      };
+    }
+    
+    ScrolledWindow {
+      vexpand: true;
+      
+      Adw.Clamp {
+        maximum-size: 800;
+        
+        Box {
+          orientation: vertical;
+          spacing: 24;
+          margin-top: 24;
+          margin-bottom: 24;
+          margin-start: 12;
+          margin-end: 12;
+          
+          // Summary Cards
+          Box summary_cards {
+            orientation: horizontal;
+            spacing: 12;
+            homogeneous: true;
+            
+            Adw.PreferencesGroup {
+              Adw.ActionRow total_requests_row {
+                title: _("Total Requests");
+                
+                [prefix]
+                Image {
+                  icon-name: "network-transmit-receive-symbolic";
+                  valign: center;
+                }
+                
+                [suffix]
+                Label total_requests_label {
+                  label: "0";
+                  
+                  styles ["title-2"]
+                }
+              }
+            }
+            
+            Adw.PreferencesGroup {
+              Adw.ActionRow unique_endpoints_row {
+                title: _("Unique Endpoints");
+                
+                [prefix]
+                Image {
+                  icon-name: "folder-symbolic";
+                  valign: center;
+                }
+                
+                [suffix]
+                Label unique_endpoints_label {
+                  label: "0";
+                  
+                  styles ["title-2"]
+                }
+              }
+            }
+            
+            Adw.PreferencesGroup {
+              Adw.ActionRow avg_size_row {
+                title: _("Avg. Request Size");
+                
+                [prefix]
+                Image {
+                  icon-name: "drive-harddisk-symbolic";
+                  valign: center;
+                }
+                
+                [suffix]
+                Label avg_size_label {
+                  label: "0 B";
+                  
+                  styles ["title-2"]
+                }
+              }
+            }
+          }
+          
+          // HTTP Methods Distribution
+          Adw.PreferencesGroup methods_group {
+            title: _("HTTP Methods Distribution");
+            
+            ListBox methods_list {
+              selection-mode: none;
+              
+              styles ["boxed-list"]
+            }
+          }
+          
+          // Content Types Distribution
+          Adw.PreferencesGroup content_types_group {
+            title: _("Content Types Distribution");
+            
+            ListBox content_types_list {
+              selection-mode: none;
+              
+              styles ["boxed-list"]
+            }
+          }
+          
+          // Top Endpoints
+          Adw.PreferencesGroup endpoints_group {
+            title: _("Most Active Endpoints");
+            
+            ListBox endpoints_list {
+              selection-mode: none;
+              
+              styles ["boxed-list"]
+            }
+          }
+        }
+      }
+    }
+  }
+}
