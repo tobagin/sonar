@@ -77,6 +77,21 @@
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
 
   <releases>
+    <release version="2.0.2" date="2025-09-18">
+      <description>
+        <p>🐛 Bug Fixes and Improvements</p>
+        <p>Metainfo Fixes:</p>
+        <ul>
+          <li>Fixed metainfo validation error causing build failures</li>
+          <li>Removed template release entry that caused ordering issues</li>
+        </ul>
+        <p>Improvements:</p>
+        <ul>
+          <li>Better appstream compliance</li>
+          <li>Enhanced build process reliability</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.0.1" date="2025-09-18">
       <description>
         <p>🐛 Bug Fixes and Improvements</p>

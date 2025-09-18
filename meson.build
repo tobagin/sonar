@@ -1,7 +1,7 @@
 project(
     'sonar',
     'vala', 'c',
-    version: '2.0.1',
+    version: '2.0.2',
     meson_version: '>= 1.0.0',
     default_options: [
         'warning_level=1',
