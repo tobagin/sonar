@@ -1,6 +1,6 @@
 app-id: io.github.tobagin.sonar.Devel
 runtime: org.gnome.Platform
-runtime-version: '48'
+runtime-version: '49'
 sdk: org.gnome.Sdk
 command: sonar
 finish-args:

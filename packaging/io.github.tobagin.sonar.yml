@@ -1,6 +1,6 @@
 app-id: io.github.tobagin.sonar
 runtime: org.gnome.Platform
-runtime-version: '48'
+runtime-version: '49'
 sdk: org.gnome.Sdk
 command: sonar
 finish-args:
@@ -46,5 +46,5 @@ modules:
     sources:
       - type: git
         url: https://github.com/tobagin/Sonar.git
-        tag: v2.0.0
-        commit: a739e0aeee231969e16ac93d0f213e61558bd26b
+        tag: v2.0.1
+        commit: cf66581c591fb648533576ff3882e81486a7433d
