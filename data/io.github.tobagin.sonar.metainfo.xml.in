@@ -131,11 +131,6 @@
         <p>Note: Due to the architectural changes, existing configuration and data from v1.x will need to be reconfigured.</p>
       </description>
     </release>
-    <release version="@VERSION@" date="2025-01-01">
-      <description>
-        <p>Vala port with improved performance and reduced dependencies.</p>
-      </description>
-    </release>
   </releases>
   <requires>
     <display_length compare="ge">360</display_length>
