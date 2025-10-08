@@ -13,6 +13,10 @@ Sonar is a native GTK4 application that provides a beautiful, intuitive interfac
 - **🔍 Detailed Inspection**: View headers, body content, query parameters, and metadata
 - **📋 Quick Copy**: One-click copying of request data, headers, or body content
 - **🎯 Accordion UI**: Focus on one request at a time with automatic expansion behavior
+- **📊 Analytics Dashboard**: View detailed statistics about your webhook history
+- **🔎 Search & Filter**: Powerful search and filtering in request history
+- **💾 Export Functionality**: Export requests as JSON for analysis
+- **⌨️ Keyboard Shortcuts**: Comprehensive keyboard shortcuts for productivity
 - **⚡ Fast & Lightweight**: Native GTK4 application with minimal resource usage
 - **🎨 Modern Design**: Clean Libadwaita interface that integrates perfectly with GNOME
 - **🔒 Secure**: Runs sandboxed via Flatpak with minimal required permissions
@@ -34,10 +38,13 @@ cd sonar
 ### From Source
 
 **Requirements:**
-- Python 3.12+
-- GTK4 development libraries
-- Libadwaita 1.4+
-- Meson build system
+- Vala compiler (valac)
+- GTK4 4.8+ development libraries
+- Libadwaita 1.4+ development libraries
+- libsoup 3.0+ development libraries
+- json-glib 1.6+ development libraries
+- libgee 0.8+ development libraries
+- Meson build system (>= 1.0.0)
 - Blueprint compiler
 
 ```bash
@@ -78,10 +85,23 @@ brew install ngrok/ngrok/ngrok  # macOS
 
 ### Keyboard Shortcuts
 
+**General:**
 - `Ctrl+Q` - Quit application
-- `Ctrl+L` - Clear all requests  
 - `Ctrl+,` - Open preferences
-- `Ctrl+C` - Copy selected request data (when request is focused)
+- `Ctrl+?` - Show keyboard shortcuts
+- `F1` - Show about dialog
+- `F11` - Toggle fullscreen
+
+**Tunnel Management:**
+- `Ctrl+T` - Start/Stop tunnel
+- `Ctrl+U` - Copy public URL
+- `F5` - Refresh status
+
+**Request Management:**
+- `Ctrl+L` - Clear all requests
+- `Ctrl+H` - View history
+
+Press `Ctrl+?` to view all available shortcuts in the app!
 
 ### Request Details
 
@@ -114,9 +134,13 @@ Each webhook request shows:
 
 ### Requirements
 
-- Python 3.12+
-- PyGObject (GTK4 bindings)
-- Dependencies: FastAPI, uvicorn, pydantic, pyngrok, python-dotenv
+- Vala compiler (valac)
+- GTK4 4.8+
+- Libadwaita 1.4+
+- libsoup 3.0+
+- json-glib 1.6+
+- libgee 0.8+
+- Meson build system
 
 ### Development Setup
 
@@ -125,38 +149,37 @@ Each webhook request shows:
 git clone https://github.com/tobagin/sonar.git
 cd sonar
 
-# Install development dependencies
-pip install -e ".[dev]"
-
 # Build for development
-./build.sh --dev --install
+./scripts/build.sh --dev
 
-# Run tests
-pytest
+# Install development build
+./scripts/build.sh --dev --install
 
-# Code quality checks
-ruff check src/ tests/
-mypy src/
+# Run the development version
+flatpak run io.github.tobagin.sonar.Devel
 ```
 
 ### Project Structure
 
 ```
 sonar/
-├── src/                    # Python source code
-│   ├── main.py            # Application entry point
-│   ├── main_window.py     # Main window implementation
-│   ├── models.py          # Data models
-│   ├── server.py          # Webhook server
-│   ├── tunnel.py          # Ngrok tunnel management
-│   └── preferences.py     # Settings dialog
+├── src/                    # Vala source code
+│   ├── application.vala   # Application entry point
+│   ├── main_window.vala   # Main window implementation
+│   ├── models.vala        # Data models
+│   ├── server.vala        # Webhook server (libsoup)
+│   ├── tunnel.vala        # Ngrok tunnel management
+│   ├── preferences_dialog.vala    # Settings dialog
+│   ├── request_row.vala   # Request list item widget
+│   ├── statistics_dialog.vala    # Statistics dashboard
+│   └── shortcuts_dialog.vala     # Keyboard shortcuts
 ├── data/                   # Application data
 │   ├── ui/                # Blueprint UI definitions
 │   ├── icons/             # Application icons
-│   └── resources/         # GResource definitions
-├── tests/                  # Test suite
+│   └── io.github.tobagin.sonar.metainfo.xml.in
 ├── packaging/              # Flatpak manifests
-└── po/                     # Internationalization
+├── po/                     # Internationalization
+└── scripts/                # Build scripts
 ```
 
 ### Building UI

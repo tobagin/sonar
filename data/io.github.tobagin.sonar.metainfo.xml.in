@@ -77,6 +77,31 @@
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
 
   <releases>
+    <release version="2.0.3" date="2025-10-08">
+      <description>
+        <p>✨ User Experience Enhancements</p>
+        <p>Keyboard Shortcuts:</p>
+        <ul>
+          <li>Redesigned keyboard shortcuts dialog with cleaner, more organized layout</li>
+          <li>Improved shortcuts presentation using native Libadwaita components</li>
+          <li>Better categorization of shortcuts by function</li>
+          <li>Enhanced accessibility and discoverability of keyboard commands</li>
+        </ul>
+        <p>Menu Improvements:</p>
+        <ul>
+          <li>Reorganized main menu for better user experience</li>
+          <li>Grouped related actions together logically</li>
+          <li>Moved frequently used actions to the top</li>
+          <li>Improved menu structure following GNOME HIG guidelines</li>
+        </ul>
+        <p>Code Quality:</p>
+        <ul>
+          <li>Simplified shortcuts dialog implementation</li>
+          <li>Reduced code complexity and improved maintainability</li>
+          <li>Better resource management and performance</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.0.2" date="2025-09-18">
       <description>
         <p>🐛 Bug Fixes and Improvements</p>
