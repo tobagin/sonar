@@ -282,45 +282,45 @@ template $SonarMainWindow : Adw.ApplicationWindow {
 menu primary_menu {
   section {
     item {
-      label: _("_Preferences");
-      action: "app.preferences";
-    }
-  }
-  
-  section {
-    item {
       label: _("_View History");
       action: "app.view-history";
     }
-    
+
     item {
       label: _("_Copy URL");
       action: "app.copy-url";
     }
-    
+
     item {
       label: _("_Toggle Tunnel");
       action: "app.toggle-tunnel";
     }
-    
+
     item {
       label: _("_Clear Requests");
       action: "app.clear-requests";
     }
   }
-  
+
+  section {
+    item {
+      label: _("_Preferences");
+      action: "app.preferences";
+    }
+  }
+
   section {
     item {
       label: _("_Keyboard Shortcuts");
       action: "win.show-help-overlay";
     }
-    
+
     item {
       label: _("_About Sonar");
       action: "app.about";
     }
   }
-  
+
   section {
     item {
       label: _("_Quit");

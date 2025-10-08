@@ -32,15 +32,6 @@ modules:
         url: https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
         sha256: 21c6d25f78ee768d894ac4c8022f96a3f4a9573c52afcd8714452856353403b6
 
-  - name: blueprint-compiler
-    buildsystem: meson
-    cleanup: ["*"]
-    sources:
-      - type: git
-        url: https://gitlab.gnome.org/jwestman/blueprint-compiler.git
-        tag: v0.18.0
-        commit: 07c9c9df9cd1b6b4454ecba21ee58211e9144a4b
-
   - name: sonar
     buildsystem: meson
     sources:
