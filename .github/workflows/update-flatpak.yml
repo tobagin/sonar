@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*.*.*'  # Matches v1.0.0, v1.2.3, etc.
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g., v2.1.0)'
+        required: true
+        type: string
 
 jobs:
   update-manifest:
@@ -22,14 +27,20 @@ jobs:
     - name: Extract version info
       id: version
       run: |
-        TAG_NAME=${GITHUB_REF#refs/tags/}
+        # Check if this is a manual dispatch or tag push
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          TAG_NAME="${{ github.event.inputs.tag }}"
+        else
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+        fi
+
         COMMIT_HASH=$(git rev-parse $TAG_NAME)
         VERSION=${TAG_NAME#v}
-        
+
         echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
         echo "commit_hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
         echo "version=$VERSION" >> $GITHUB_OUTPUT
-        
+
         echo "📦 Processing release: $TAG_NAME"
         echo "🔍 Commit hash: $COMMIT_HASH"
         echo "📈 Version: $VERSION"
