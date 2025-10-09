@@ -16,11 +16,20 @@ template $SonarRequestRow : Adw.ExpanderRow {
   }
   
   [suffix]
+  Gtk.Button star_button {
+    icon-name: "non-starred-symbolic";
+    tooltip-text: _("Star Request");
+    valign: center;
+
+    styles ["flat", "circular"]
+  }
+
+  [suffix]
   Gtk.Button copy_button {
     icon-name: "edit-copy-symbolic";
     tooltip-text: _("Copy Request Data");
     valign: center;
-    
+
     styles ["flat"]
   }
   
@@ -95,20 +104,90 @@ template $SonarRequestRow : Adw.ExpanderRow {
   
   Adw.ActionRow {
     title: _("Body");
-    
+
     [prefix]
     Gtk.Image {
       icon-name: "accessories-text-editor-symbolic";
       valign: center;
     }
-    
+
     [suffix]
     Gtk.Button copy_body_button {
       icon-name: "edit-copy-symbolic";
       tooltip-text: _("Copy Body");
       valign: center;
-      
+
       styles ["flat"]
+    }
+  }
+
+  Adw.ActionRow {
+    title: _("Export");
+
+    [prefix]
+    Gtk.Image {
+      icon-name: "document-save-symbolic";
+      valign: center;
+    }
+
+    [suffix]
+    Gtk.Box {
+      orientation: horizontal;
+      spacing: 6;
+
+      Gtk.Button copy_curl_button {
+        label: _("Copy as cURL");
+        valign: center;
+
+        styles ["flat", "suggested-action"]
+      }
+
+      Gtk.Button copy_http_button {
+        label: _("Copy as HTTP");
+        valign: center;
+
+        styles ["flat"]
+      }
+    }
+  }
+
+  Adw.ActionRow {
+    title: _("Actions");
+
+    [prefix]
+    Gtk.Image {
+      icon-name: "media-playback-start-symbolic";
+      valign: center;
+    }
+
+    [suffix]
+    Gtk.Box {
+      orientation: horizontal;
+      spacing: 6;
+
+      Gtk.Button replay_button {
+        label: _("Replay Request");
+        tooltip-text: _("Resend this request to a custom URL");
+        valign: center;
+
+        styles ["flat"]
+      }
+
+      Gtk.Button compare_button {
+        label: _("Select for Comparison");
+        tooltip-text: _("Compare with another request");
+        valign: center;
+
+        styles ["flat"]
+      }
+
+      Gtk.Button save_template_button {
+        label: _("Save as Template");
+        tooltip-text: _("Save this request as a reusable template");
+        valign: center;
+
+        styles ["flat", "suggested-action"]
+      }
     }
   }
   

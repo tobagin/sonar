@@ -382,7 +382,7 @@ namespace Sonar {
         
         private void _on_preferences_action() {
             if (this.window != null) {
-                var preferences = new PreferencesDialog(this.window, this.tunnel_manager);
+                var preferences = new PreferencesDialog(this.window, this.tunnel_manager, this.server);
                 preferences.present(this.window);
             }
         }

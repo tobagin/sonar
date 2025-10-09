@@ -12,14 +12,24 @@
       technologies and following GNOME design patterns, Sonar makes webhook debugging 
       simple and efficient.
     </p>
-    <p>Features:</p>
+    <p>Core Features:</p>
     <ul>
       <li>Instant public URLs via ngrok integration for webhook testing</li>
       <li>Real-time capture of incoming webhook requests as they arrive</li>
       <li>Detailed inspection of headers, body content, query parameters, and metadata</li>
-      <li>Quick copy functionality for request data, headers, or body content</li>
+      <li>Quick copy functionality including JSON, cURL, and HTTP formats</li>
       <li>Clean Libadwaita interface that integrates perfectly with GNOME</li>
       <li>Fast and lightweight native application with minimal resource usage</li>
+    </ul>
+    <p>Advanced Features:</p>
+    <ul>
+      <li>Request bookmarking and starring for quick access</li>
+      <li>Request replay to resend webhooks to custom URLs</li>
+      <li>Side-by-side request comparison to spot differences</li>
+      <li>Request templates for saving and reusing webhook patterns</li>
+      <li>Automatic webhook forwarding to multiple URLs</li>
+      <li>Advanced filtering by method, content-type, time range, and search</li>
+      <li>Persistent history with JSON storage</li>
     </ul>
   </description>
   <screenshots>
@@ -77,6 +87,64 @@
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
 
   <releases>
+    <release version="2.1.0" date="2025-10-09">
+      <description>
+        <p>🚀 Major Feature Release - Advanced Webhook Tools</p>
+        <p>This release introduces powerful new features for advanced webhook inspection, testing, and automation workflows.</p>
+        <p>🎯 Advanced Filtering:</p>
+        <ul>
+          <li>Filter webhooks by HTTP method (GET, POST, PUT, DELETE, etc.)</li>
+          <li>Filter by content-type (JSON, XML, form-data, etc.)</li>
+          <li>Filter by time range (5min, 15min, 30min, 1hr, 24hr)</li>
+          <li>Full-text search in request path and body</li>
+          <li>Show only starred/bookmarked requests</li>
+        </ul>
+        <p>⭐ Request Bookmarking:</p>
+        <ul>
+          <li>Star important requests for quick reference</li>
+          <li>Toggle starred status with one click</li>
+          <li>Filter view to show only starred requests</li>
+          <li>Persistent bookmarks saved with JSON serialization</li>
+        </ul>
+        <p>🔄 Request Replay:</p>
+        <ul>
+          <li>Resend any captured webhook to custom URLs</li>
+          <li>Preserves original HTTP method, headers, and body</li>
+          <li>Async request sending for non-blocking operation</li>
+          <li>Toast notifications with success/failure status codes</li>
+        </ul>
+        <p>⚖️ Request Comparison:</p>
+        <ul>
+          <li>Compare two webhooks side-by-side</li>
+          <li>Highlights differences in method, path, and content-type</li>
+          <li>Full headers and body comparison views</li>
+          <li>Perfect for spotting changes between webhook versions</li>
+        </ul>
+        <p>📝 Request Templates:</p>
+        <ul>
+          <li>Save any request as a reusable template</li>
+          <li>Add name and description to templates</li>
+          <li>Persistent storage in JSON format</li>
+          <li>Quick access to common webhook patterns</li>
+        </ul>
+        <p>🔀 Webhook Forwarding:</p>
+        <ul>
+          <li>Automatically forward all incoming webhooks to multiple URLs</li>
+          <li>Configure forwarding in Preferences with multiple target URLs</li>
+          <li>Option to preserve HTTP method or force POST</li>
+          <li>Option to include original headers or send clean</li>
+          <li>Async forwarding for zero performance impact</li>
+          <li>Perfect for local development and staging environments</li>
+        </ul>
+        <p>📤 Enhanced Export:</p>
+        <ul>
+          <li>Export as cURL command with proper escaping</li>
+          <li>Export as raw HTTP request format</li>
+          <li>One-click copy to clipboard</li>
+          <li>Perfect for sharing and debugging</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.0.3" date="2025-10-08">
       <description>
         <p>✨ User Experience Enhancements</p>

@@ -18,17 +18,26 @@ namespace Sonar {
 #endif
     public class PreferencesDialog : Adw.PreferencesDialog {
         private TunnelManager tunnel_manager;
+        private WebhookServer server;
+
         [GtkChild] private unowned Entry auth_token_entry;
         [GtkChild] private unowned Button save_token_button;
         [GtkChild] private unowned Button test_token_button;
         [GtkChild] private unowned Label token_status_label;
         [GtkChild] private unowned Label ngrok_version_label;
         [GtkChild] private unowned Adw.ActionRow help_row;
-        
-        public PreferencesDialog(Gtk.Window parent, TunnelManager tunnel_manager) {
+
+        // Forwarding widgets
+        [GtkChild] private unowned Switch enable_forwarding_switch;
+        [GtkChild] private unowned TextView forwarding_urls_textview;
+        [GtkChild] private unowned Switch preserve_method_switch;
+        [GtkChild] private unowned Switch forward_headers_switch;
+
+        public PreferencesDialog(Gtk.Window parent, TunnelManager tunnel_manager, WebhookServer server) {
             Object();
             this.tunnel_manager = tunnel_manager;
-            
+            this.server = server;
+
             this._setup_signals();
             this._load_current_settings();
         }
@@ -38,7 +47,7 @@ namespace Sonar {
             this.auth_token_entry.changed.connect(this._on_token_entry_changed);
             this.save_token_button.clicked.connect(this._on_save_token_clicked);
             this.test_token_button.clicked.connect(this._on_test_token_clicked);
-            
+
             this.help_row.activated.connect(() => {
                 try {
                     AppInfo.launch_default_for_uri("https://ngrok.com/signup", null);
@@ -46,11 +55,17 @@ namespace Sonar {
                     warning("Failed to open URL: %s", e.message);
                 }
             });
+
+            // Forwarding signals
+            this.enable_forwarding_switch.notify["active"].connect(this._on_forwarding_settings_changed);
+            this.preserve_method_switch.notify["active"].connect(this._on_forwarding_settings_changed);
+            this.forward_headers_switch.notify["active"].connect(this._on_forwarding_settings_changed);
+            this.forwarding_urls_textview.get_buffer().changed.connect(this._on_forwarding_urls_changed);
         }
         
         private void _load_current_settings() {
             var tunnel_status = this.tunnel_manager.get_status();
-            
+
             if (tunnel_status.error == null || !tunnel_status.error.contains("No NGROK_AUTHTOKEN")) {
                 this.token_status_label.set_text("Token configured");
                 this.token_status_label.add_css_class("success");
@@ -60,10 +75,21 @@ namespace Sonar {
                 this.token_status_label.remove_css_class("success");
                 this.token_status_label.add_css_class("error");
             }
-            
+
             // Set ngrok version
             var version = TunnelManager.get_version();
             this.ngrok_version_label.set_text(version ?? "Not installed");
+
+            // Load forwarding settings
+            this.enable_forwarding_switch.set_active(this.server.is_forwarding_enabled());
+            this.preserve_method_switch.set_active(this.server.get_preserve_method());
+            this.forward_headers_switch.set_active(this.server.get_forward_headers());
+
+            var urls = this.server.get_forward_urls();
+            if (urls.size > 0) {
+                var buffer = this.forwarding_urls_textview.get_buffer();
+                buffer.set_text(string.joinv("\n", urls.to_array()), -1);
+            }
         }
         
         private void _on_token_entry_changed() {
@@ -143,6 +169,29 @@ namespace Sonar {
             var dialog = new Adw.AlertDialog("Error", message);
             dialog.add_response("ok", "OK");
             dialog.present(this);
+        }
+
+        private void _on_forwarding_settings_changed() {
+            this.server.set_forwarding_enabled(this.enable_forwarding_switch.get_active());
+            this.server.set_preserve_method(this.preserve_method_switch.get_active());
+            this.server.set_forward_headers(this.forward_headers_switch.get_active());
+        }
+
+        private void _on_forwarding_urls_changed() {
+            var buffer = this.forwarding_urls_textview.get_buffer();
+            TextIter start, end;
+            buffer.get_bounds(out start, out end);
+            string text = buffer.get_text(start, end, false);
+
+            var urls = new Gee.ArrayList<string>();
+            foreach (var line in text.split("\n")) {
+                var url = line.strip();
+                if (url.length > 0 && (url.has_prefix("http://") || url.has_prefix("https://"))) {
+                    urls.add(url);
+                }
+            }
+
+            this.server.set_forward_urls(urls);
         }
     }
 }

@@ -17,7 +17,13 @@ namespace Sonar {
         private string host;
         private bool is_running;
         private uint server_source_id;
-        
+
+        // Forwarding settings
+        private bool forwarding_enabled = false;
+        private Gee.ArrayList<string> forward_urls;
+        private bool preserve_method = true;
+        private bool forward_headers = true;
+
         public signal void request_received(WebhookRequest request);
         
         public WebhookServer(RequestStorage request_storage) {
@@ -26,7 +32,8 @@ namespace Sonar {
             this.host = "127.0.0.1";
             this.is_running = false;
             this.server_source_id = 0;
-            
+            this.forward_urls = new Gee.ArrayList<string>();
+
             this.server = new Soup.Server("server-header", @"Sonar-Vala/$(Config.VERSION)");
             this._setup_routes();
         }
@@ -171,10 +178,15 @@ namespace Sonar {
                 
                 // Store request
                 this.storage.add_request(webhook_request);
-                
+
+                // Forward webhook if enabled
+                if (this.forwarding_enabled && this.forward_urls.size > 0) {
+                    this._forward_webhook_async.begin(webhook_request);
+                }
+
                 // Emit signal
                 this.request_received(webhook_request);
-                
+
                 info("Received %s request to %s", method, webhook_request.path);
                 
                 // Return success response
@@ -341,9 +353,77 @@ namespace Sonar {
         public string get_url() {
             return @"http://$(this.host):$(this.port)";
         }
-        
+
         public bool get_is_running() {
             return this.is_running;
+        }
+
+        // Forwarding API
+        public void set_forwarding_enabled(bool enabled) {
+            this.forwarding_enabled = enabled;
+            debug("Forwarding %s", enabled ? "enabled" : "disabled");
+        }
+
+        public bool is_forwarding_enabled() {
+            return this.forwarding_enabled;
+        }
+
+        public void set_forward_urls(Gee.ArrayList<string> urls) {
+            this.forward_urls = urls;
+            debug("Set %d forward URLs", urls.size);
+        }
+
+        public Gee.ArrayList<string> get_forward_urls() {
+            return this.forward_urls;
+        }
+
+        public void set_preserve_method(bool preserve) {
+            this.preserve_method = preserve;
+        }
+
+        public bool get_preserve_method() {
+            return this.preserve_method;
+        }
+
+        public void set_forward_headers(bool forward) {
+            this.forward_headers = forward;
+        }
+
+        public bool get_forward_headers() {
+            return this.forward_headers;
+        }
+
+        private async void _forward_webhook_async(WebhookRequest request) {
+            var session = new Soup.Session();
+
+            foreach (var url in this.forward_urls) {
+                try {
+                    var method = this.preserve_method ? request.method : "POST";
+                    var message = new Soup.Message(method, url);
+
+                    // Add headers if enabled
+                    if (this.forward_headers) {
+                        request.headers.foreach((key, value) => {
+                            message.request_headers.append(key, value);
+                        });
+                    }
+
+                    // Add body
+                    if (request.body.length > 0) {
+                        message.set_request_body_from_bytes(
+                            request.content_type ?? "application/octet-stream",
+                            new Bytes(request.body.data)
+                        );
+                    }
+
+                    // Send async
+                    yield session.send_async(message, Priority.DEFAULT, null);
+
+                    info("Forwarded %s request to %s (status: %u)", method, url, message.status_code);
+                } catch (Error e) {
+                    warning("Failed to forward to %s: %s", url, e.message);
+                }
+            }
         }
     }
 }

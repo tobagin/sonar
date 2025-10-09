@@ -8,15 +8,29 @@ Sonar is a native GTK4 application that provides a beautiful, intuitive interfac
 
 ## ✨ Features
 
+### Core Features
 - **🔗 Instant Public URLs**: Generate public URLs via ngrok integration for webhook testing
 - **📡 Real-time Capture**: Live display of incoming webhook requests as they arrive
 - **🔍 Detailed Inspection**: View headers, body content, query parameters, and metadata
 - **📋 Quick Copy**: One-click copying of request data, headers, or body content
 - **🎯 Accordion UI**: Focus on one request at a time with automatic expansion behavior
+
+### Advanced Features
+- **⭐ Request Bookmarking**: Star important requests for quick access
+- **🔄 Request Replay**: Resend any webhook to custom URLs with full control
+- **⚖️ Request Comparison**: Side-by-side diff of two webhooks to spot differences
+- **📝 Request Templates**: Save requests as reusable templates for testing
+- **🔀 Webhook Forwarding**: Automatically forward webhooks to multiple URLs
+- **🎯 Advanced Filtering**: Filter by method, content-type, time range, and search text
+- **📤 Export Options**: Export as JSON, cURL command, or HTTP format
+
+### Developer Tools
 - **📊 Analytics Dashboard**: View detailed statistics about your webhook history
 - **🔎 Search & Filter**: Powerful search and filtering in request history
-- **💾 Export Functionality**: Export requests as JSON for analysis
+- **💾 Persistent History**: All requests saved to disk with JSON storage
 - **⌨️ Keyboard Shortcuts**: Comprehensive keyboard shortcuts for productivity
+
+### Technical Excellence
 - **⚡ Fast & Lightweight**: Native GTK4 application with minimal resource usage
 - **🎨 Modern Design**: Clean Libadwaita interface that integrates perfectly with GNOME
 - **🔒 Secure**: Runs sandboxed via Flatpak with minimal required permissions
@@ -118,7 +132,54 @@ Each webhook request shows:
 - **Copy All** - Complete request data as JSON
 - **Copy Headers** - Just the headers in HTTP format
 - **Copy Body** - Just the request body content
+- **Copy as cURL** - Generate cURL command for replaying
+- **Copy as HTTP** - Generate raw HTTP request format
 - **Copy URL** - The public ngrok URL
+
+### Advanced Features
+
+#### Request Filtering
+Filter webhooks by multiple criteria:
+- **HTTP Method** - GET, POST, PUT, DELETE, PATCH, etc.
+- **Content Type** - JSON, XML, form data, etc.
+- **Time Range** - Last 5 min, 15 min, 30 min, hour, or 24 hours
+- **Search Text** - Search in path and body content
+- **Starred Only** - Show only bookmarked requests
+
+#### Request Replay
+Resend any captured webhook to test your endpoints:
+1. Click "Replay Request" on any webhook
+2. Enter the target URL (pre-filled with original path)
+3. Request is sent with original method, headers, and body
+4. Get instant feedback on success/failure
+
+#### Request Comparison
+Compare two webhooks side-by-side:
+1. Click "Select for Comparison" on first request
+2. Click "Compare with Selected" on second request
+3. View differences highlighted in:
+   - HTTP method
+   - Request path
+   - Content type
+   - Headers (side-by-side)
+   - Body content (side-by-side)
+
+#### Request Templates
+Save webhooks as reusable templates:
+1. Click "Save as Template" on any request
+2. Give it a name and description
+3. Templates are stored persistently
+4. Use templates for quick testing scenarios
+
+#### Webhook Forwarding
+Automatically forward all incoming webhooks:
+1. Open Preferences → Forwarding tab
+2. Enable forwarding and add target URLs
+3. Choose options:
+   - Preserve original HTTP method or force POST
+   - Include original headers or send clean
+4. All webhooks are forwarded asynchronously
+5. Perfect for local development or staging environments
 
 ## 📸 Screenshots
 

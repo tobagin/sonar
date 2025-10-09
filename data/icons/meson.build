@@ -8,3 +8,9 @@ foreach size : icon_sizes
     rename: app_id + '.png'
   )
 endforeach
+
+# Install symbolic icons
+install_data(
+  join_paths('hicolor', 'scalable', 'actions', 'io.github.tobagin.sonar-filter-symbolic.svg'),
+  install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', 'scalable', 'actions')
+)

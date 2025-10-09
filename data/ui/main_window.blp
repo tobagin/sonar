@@ -138,45 +138,114 @@ template $SonarMainWindow : Adw.ApplicationWindow {
                 spacing: 12;
                 margin-start: 6;
                 margin-end: 6;
-                
+
                 Gtk.Label {
                   label: _("Received Requests");
                   halign: start;
                   hexpand: true;
-                  
+
                   styles ["title-2"]
                 }
-                
+
                 Gtk.Box clear_container {
                   orientation: horizontal;
                   spacing: 8;
-                  
+
+                  Gtk.Button filter_button {
+                    icon-name: "io.github.tobagin.sonar-filter-symbolic";
+                    tooltip-text: _("Filter Requests");
+
+                    styles ["flat"]
+                  }
+
                   Gtk.Button history_button {
                     icon-name: "document-open-recent-symbolic";
                     tooltip-text: _("View History");
-                    
+
                     styles ["flat"]
                   }
-                  
+
                   Gtk.Button clear_button {
                     icon-name: "edit-clear-symbolic";
                     tooltip-text: _("Clear All Requests");
-                    
+
                     styles ["flat"]
                   }
-                  
+
                   Gtk.Spinner clear_spinner {
                     visible: false;
                     spinning: false;
                   }
                 }
               }
-              
+
+              // Filter toolbar (initially hidden)
+              Gtk.Revealer filter_revealer {
+                reveal-child: false;
+
+                child: Gtk.Box {
+                  orientation: vertical;
+                  spacing: 6;
+                  margin-start: 6;
+                  margin-end: 6;
+                  margin-bottom: 6;
+
+                  Gtk.Box {
+                    orientation: horizontal;
+                    spacing: 12;
+
+                    Gtk.DropDown requests_method_filter {
+                      tooltip-text: _("Filter by HTTP method");
+                      hexpand: true;
+
+                      styles ["flat"]
+                    }
+
+                    Gtk.DropDown requests_content_type_filter {
+                      tooltip-text: _("Filter by content type");
+                      hexpand: true;
+
+                      styles ["flat"]
+                    }
+
+                    Gtk.DropDown requests_time_filter {
+                      tooltip-text: _("Filter by time");
+                      hexpand: true;
+
+                      styles ["flat"]
+                    }
+                  }
+
+                  Gtk.Box {
+                    orientation: horizontal;
+                    spacing: 12;
+
+                    Gtk.SearchEntry requests_search_entry {
+                      placeholder-text: _("Search in path or body...");
+                      hexpand: true;
+                    }
+
+                    Gtk.ToggleButton starred_only_toggle {
+                      icon-name: "starred-symbolic";
+                      tooltip-text: _("Show only starred requests");
+
+                      styles ["flat"]
+                    }
+
+                    Gtk.Button clear_filters_button {
+                      label: _("Clear Filters");
+
+                      styles ["flat"]
+                    }
+                  }
+                };
+              }
+
               Gtk.ListBox request_list {
                 selection-mode: none;
                 hexpand: true;
                 vexpand: true;
-                
+
                 styles ["boxed-list", "separators"]
               }
             };

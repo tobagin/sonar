@@ -33,13 +33,17 @@ namespace Sonar {
         [GtkChild] private unowned Button start_tunnel_button;
         [GtkChild] private unowned Gtk.Spinner tunnel_spinner;
         [GtkChild] private unowned Button clear_button;
-        // [GtkChild] private unowned Box tunnel_actions;
-        // [GtkChild] private unowned Button copy_url_button;
-        // [GtkChild] private unowned Label url_label;
-        // [GtkChild] private unowned Box clear_container;
-        // [GtkChild] private unowned Button clear_requests_button;
+        // Requests filter UI
+        [GtkChild] private unowned Button filter_button;
+        [GtkChild] private unowned Revealer filter_revealer;
+        [GtkChild] private unowned SearchEntry requests_search_entry;
+        [GtkChild] private unowned DropDown requests_method_filter;
+        [GtkChild] private unowned DropDown requests_content_type_filter;
+        [GtkChild] private unowned DropDown requests_time_filter;
+        [GtkChild] private unowned ToggleButton starred_only_toggle;
+        [GtkChild] private unowned Button clear_filters_button;
         [GtkChild] private unowned ListBox request_list;
-        // [GtkChild] private unowned Box history_toolbar;
+        // History UI
         [GtkChild] private unowned SearchEntry history_search_entry;
         [GtkChild] private unowned DropDown history_method_filter;
         [GtkChild] private unowned Button clear_history_button;
@@ -53,6 +57,15 @@ namespace Sonar {
         private TunnelManager tunnel_manager;
         private Gee.HashMap<string, RequestRow> request_rows;
         private RequestRow? currently_expanded_row;
+
+        // Filter state
+        private string? filter_method = null;
+        private string? filter_content_type = null;
+        private string? filter_time_range = null;
+        private string? filter_search_text = null;
+
+        // Comparison state
+        private WebhookRequest? comparison_request = null;
         
         public MainWindow(Adw.Application app, RequestStorage storage, 
                          WebhookServer server, TunnelManager tunnel_manager) {
@@ -72,9 +85,48 @@ namespace Sonar {
             // UI is now loaded from template
             // Just configure what's needed
             this.set_default_size(900, 600);
-            
+
             // Configure banner signal
             this.status_banner.button_clicked.connect(this._on_banner_button_clicked);
+
+            // Setup filter dropdowns
+            this._setup_filter_dropdowns();
+        }
+
+        private void _setup_filter_dropdowns() {
+            // HTTP Method filter for requests
+            var methods = new string[] {"All Methods", "GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"};
+            this.requests_method_filter.set_model(new StringList(methods));
+            this.requests_method_filter.set_selected(0);
+
+            // Content Type filter
+            var content_types = new string[] {
+                "All Types",
+                "application/json",
+                "application/x-www-form-urlencoded",
+                "multipart/form-data",
+                "text/plain",
+                "text/html",
+                "application/xml"
+            };
+            this.requests_content_type_filter.set_model(new StringList(content_types));
+            this.requests_content_type_filter.set_selected(0);
+
+            // Time filter
+            var time_ranges = new string[] {
+                "All Time",
+                "Last 5 minutes",
+                "Last 15 minutes",
+                "Last 30 minutes",
+                "Last hour",
+                "Last 24 hours"
+            };
+            this.requests_time_filter.set_model(new StringList(time_ranges));
+            this.requests_time_filter.set_selected(0);
+
+            // HTTP Method filter for history
+            this.history_method_filter.set_model(new StringList(methods));
+            this.history_method_filter.set_selected(0);
         }
         
         private void _setup_window_actions() {
@@ -106,12 +158,19 @@ namespace Sonar {
             this.stop_tunnel_button.clicked.connect(this._on_stop_tunnel_clicked);
             this.header_stop_button.clicked.connect(this._on_stop_tunnel_clicked);
             this.clear_button.clicked.connect(this._on_clear_requests_clicked);
-            // this.copy_url_button.clicked.connect(this._on_copy_url_clicked);
-            // this.clear_requests_button.clicked.connect(this._on_clear_requests_clicked);
             this.header_history_button.clicked.connect(this._on_history_button_clicked);
             this.history_button.clicked.connect(this._on_history_button_clicked);
             this.clear_history_button.clicked.connect(this._on_clear_history_clicked);
             this.history_stats_button.clicked.connect(this._on_history_stats_clicked);
+
+            // Filter signals
+            this.filter_button.clicked.connect(this._on_filter_button_clicked);
+            this.clear_filters_button.clicked.connect(this._on_clear_filters_clicked);
+            this.requests_search_entry.search_changed.connect(this._on_requests_search_changed);
+            this.requests_method_filter.notify["selected"].connect(this._on_filter_changed);
+            this.requests_content_type_filter.notify["selected"].connect(this._on_filter_changed);
+            this.requests_time_filter.notify["selected"].connect(this._on_filter_changed);
+            this.starred_only_toggle.toggled.connect(this._on_filter_changed);
             this.export_history_button.clicked.connect(this._on_export_history_clicked);
             this.back_to_requests_button.clicked.connect(this._on_back_to_requests_clicked);
             
@@ -279,7 +338,7 @@ namespace Sonar {
         }
         
         private void _on_setup_token_clicked() {
-            var preferences = new PreferencesDialog(this, this.tunnel_manager);
+            var preferences = new PreferencesDialog(this, this.tunnel_manager, this.server);
             preferences.present(this);
         }
         
@@ -335,6 +394,11 @@ namespace Sonar {
                 var row = new RequestRow(request, this, false); // Not history mode
                 this.request_rows[request.id] = row;
                 this.request_list.append(row);
+
+                // Apply filters to the new request
+                bool should_show = this._request_matches_filters(request);
+                row.set_visible(should_show);
+
                 this._update_ui_state();
                 return Source.REMOVE;
             });
@@ -719,13 +783,13 @@ namespace Sonar {
                 _("Delete Request"),
                 _("Are you sure you want to delete this request from history? This action cannot be undone.")
             );
-            
+
             dialog.add_response("cancel", _("Cancel"));
             dialog.add_response("delete", _("Delete"));
             dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE);
             dialog.set_default_response("cancel");
             dialog.set_close_response("cancel");
-            
+
             dialog.response.connect((response) => {
                 if (response == "delete") {
                     if (this.storage.remove_from_history(request_id)) {
@@ -734,8 +798,368 @@ namespace Sonar {
                     }
                 }
             });
-            
+
             dialog.present(this);
+        }
+
+        // Filter functionality
+        private void _on_filter_button_clicked() {
+            bool current_state = this.filter_revealer.get_reveal_child();
+            this.filter_revealer.set_reveal_child(!current_state);
+        }
+
+        private void _on_clear_filters_clicked() {
+            // Reset all filters
+            this.requests_method_filter.set_selected(0);
+            this.requests_content_type_filter.set_selected(0);
+            this.requests_time_filter.set_selected(0);
+            this.requests_search_entry.set_text("");
+            this.starred_only_toggle.set_active(false);
+
+            // Clear filter state
+            this.filter_method = null;
+            this.filter_content_type = null;
+            this.filter_time_range = null;
+            this.filter_search_text = null;
+
+            // Refresh display
+            this._apply_filters();
+        }
+
+        private void _on_requests_search_changed() {
+            this.filter_search_text = this.requests_search_entry.get_text().strip();
+            this._apply_filters();
+        }
+
+        private void _on_filter_changed() {
+            // Get selected filter values
+            var method_idx = this.requests_method_filter.get_selected();
+            var content_type_idx = this.requests_content_type_filter.get_selected();
+            var time_idx = this.requests_time_filter.get_selected();
+
+            // Update filter state
+            this.filter_method = method_idx > 0 ? this._get_method_from_index((int)method_idx) : null;
+            this.filter_content_type = content_type_idx > 0 ? this._get_content_type_from_index((int)content_type_idx) : null;
+            this.filter_time_range = time_idx > 0 ? this._get_time_range_from_index((int)time_idx) : null;
+
+            // Apply filters
+            this._apply_filters();
+        }
+
+        private void _apply_filters() {
+            // Iterate through all request rows and show/hide based on filters
+            var requests = this.storage.get_requests();
+
+            foreach (var request in requests) {
+                var row = this.request_rows.get(request.id);
+                if (row != null) {
+                    bool should_show = this._request_matches_filters(request);
+                    row.set_visible(should_show);
+                }
+            }
+        }
+
+        private bool _request_matches_filters(WebhookRequest request) {
+            // Starred filter
+            if (this.starred_only_toggle.get_active() && !request.is_starred) {
+                return false;
+            }
+
+            // Method filter
+            if (this.filter_method != null && request.method != this.filter_method) {
+                return false;
+            }
+
+            // Content type filter
+            if (this.filter_content_type != null) {
+                if (request.content_type == null || !request.content_type.contains(this.filter_content_type)) {
+                    return false;
+                }
+            }
+
+            // Time filter
+            if (this.filter_time_range != null) {
+                if (!this._is_within_time_range(request.timestamp, this.filter_time_range)) {
+                    return false;
+                }
+            }
+
+            // Search text filter
+            if (this.filter_search_text != null && this.filter_search_text.length > 0) {
+                string search_lower = this.filter_search_text.down();
+                bool matches = request.path.down().contains(search_lower) ||
+                              request.body.down().contains(search_lower);
+                if (!matches) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool _is_within_time_range(DateTime timestamp, string range) {
+            var now = new DateTime.now_local();
+            var diff = now.difference(timestamp);
+
+            switch (range) {
+                case "Last 5 minutes":
+                    return diff <= 5 * TimeSpan.MINUTE;
+                case "Last 15 minutes":
+                    return diff <= 15 * TimeSpan.MINUTE;
+                case "Last 30 minutes":
+                    return diff <= 30 * TimeSpan.MINUTE;
+                case "Last hour":
+                    return diff <= TimeSpan.HOUR;
+                case "Last 24 hours":
+                    return diff <= 24 * TimeSpan.HOUR;
+                default:
+                    return true;
+            }
+        }
+
+        private string? _get_method_from_index(int index) {
+            switch (index) {
+                case 1: return "GET";
+                case 2: return "POST";
+                case 3: return "PUT";
+                case 4: return "DELETE";
+                case 5: return "PATCH";
+                case 6: return "HEAD";
+                case 7: return "OPTIONS";
+                default: return null;
+            }
+        }
+
+        private string? _get_content_type_from_index(int index) {
+            switch (index) {
+                case 1: return "application/json";
+                case 2: return "application/x-www-form-urlencoded";
+                case 3: return "multipart/form-data";
+                case 4: return "text/plain";
+                case 5: return "text/html";
+                case 6: return "application/xml";
+                default: return null;
+            }
+        }
+
+        private string? _get_time_range_from_index(int index) {
+            switch (index) {
+                case 1: return "Last 5 minutes";
+                case 2: return "Last 15 minutes";
+                case 3: return "Last 30 minutes";
+                case 4: return "Last hour";
+                case 5: return "Last 24 hours";
+                default: return null;
+            }
+        }
+
+        // Bookmark/Star functionality
+        public void on_request_starred_changed(WebhookRequest request) {
+            // The request object is already updated, just trigger a save
+            // Storage will automatically save on next export or app close
+            // For now, we can just log it
+            debug("Request %s starred status changed to: %s", request.id, request.is_starred.to_string());
+        }
+
+        public void toggle_starred_filter() {
+            // TODO: Implement "show only starred" filter option
+        }
+
+        // Template functionality
+        public void save_request_as_template(WebhookRequest request, string name, string description) {
+            var template = new RequestTemplate.from_request(request, name, description);
+            this.storage.add_template(template);
+            this._show_toast(@"Template '$(name)' saved successfully");
+        }
+
+        // Comparison functionality
+        public void select_for_comparison(WebhookRequest request) {
+            this.comparison_request = request;
+
+            // Enable compare buttons on all request rows
+            this._update_compare_buttons_state();
+
+            this._show_toast(@"Selected request for comparison. Click Compare on another request to see differences.");
+        }
+
+        public void compare_with_selected(WebhookRequest request) {
+            if (this.comparison_request == null) {
+                this._show_toast("Please select a request for comparison first");
+                return;
+            }
+
+            this._show_comparison_dialog(this.comparison_request, request);
+        }
+
+        public WebhookRequest? get_comparison_request() {
+            return this.comparison_request;
+        }
+
+        private void _update_compare_buttons_state() {
+            // Update all request rows to enable/disable compare button
+            foreach (var entry in this.request_rows.entries) {
+                var row = entry.value;
+                row.update_compare_button_state(this.comparison_request != null);
+            }
+        }
+
+        private void _show_comparison_dialog(WebhookRequest request1, WebhookRequest request2) {
+            var dialog = new Adw.Dialog();
+            dialog.set_title("Compare Requests");
+            dialog.set_content_width(1000);
+            dialog.set_content_height(700);
+
+            // Create toolbar with close button
+            var toolbar = new Adw.ToolbarView();
+            var header = new Adw.HeaderBar();
+            toolbar.add_top_bar(header);
+
+            // Create scrolled window for comparison content
+            var scrolled = new ScrolledWindow();
+            scrolled.set_vexpand(true);
+
+            // Main comparison layout
+            var main_box = new Box(Orientation.VERTICAL, 12);
+            main_box.set_margin_top(12);
+            main_box.set_margin_bottom(12);
+            main_box.set_margin_start(12);
+            main_box.set_margin_end(12);
+
+            // Request headers
+            var header_box = new Box(Orientation.HORIZONTAL, 12);
+            header_box.set_homogeneous(true);
+
+            var request1_header = this._create_request_header_box(request1, "Request 1");
+            var request2_header = this._create_request_header_box(request2, "Request 2");
+
+            header_box.append(request1_header);
+            header_box.append(request2_header);
+            main_box.append(header_box);
+
+            // Comparison sections
+            main_box.append(this._create_comparison_section("Method",
+                request1.method, request2.method, request1.method != request2.method));
+
+            main_box.append(this._create_comparison_section("Path",
+                request1.path, request2.path, request1.path != request2.path));
+
+            main_box.append(this._create_comparison_section("Content-Type",
+                request1.content_type ?? "N/A",
+                request2.content_type ?? "N/A",
+                request1.content_type != request2.content_type));
+
+            main_box.append(this._create_comparison_text_section("Headers",
+                request1.get_formatted_headers(),
+                request2.get_formatted_headers()));
+
+            main_box.append(this._create_comparison_text_section("Body",
+                request1.get_formatted_body(),
+                request2.get_formatted_body()));
+
+            scrolled.set_child(main_box);
+            toolbar.set_content(scrolled);
+            dialog.set_child(toolbar);
+
+            dialog.present(this);
+
+            // Clear comparison selection after showing dialog
+            this.comparison_request = null;
+            this._update_compare_buttons_state();
+        }
+
+        private Box _create_request_header_box(WebhookRequest request, string title) {
+            var box = new Box(Orientation.VERTICAL, 6);
+
+            var title_label = new Label(title);
+            title_label.add_css_class("title-3");
+            title_label.set_xalign(0);
+
+            var time_label = new Label(request.timestamp.format("%Y-%m-%d %H:%M:%S"));
+            time_label.add_css_class("dim-label");
+            time_label.set_xalign(0);
+
+            box.append(title_label);
+            box.append(time_label);
+
+            return box;
+        }
+
+        private Box _create_comparison_section(string label, string value1, string value2, bool different) {
+            var box = new Box(Orientation.VERTICAL, 6);
+
+            var label_widget = new Label(label);
+            label_widget.add_css_class("heading");
+            label_widget.set_xalign(0);
+            box.append(label_widget);
+
+            var values_box = new Box(Orientation.HORIZONTAL, 12);
+            values_box.set_homogeneous(true);
+
+            var value1_box = new Box(Orientation.VERTICAL, 0);
+            var value1_label = new Label(value1);
+            value1_label.set_xalign(0);
+            value1_label.set_wrap(true);
+            value1_label.set_wrap_mode(Pango.WrapMode.WORD_CHAR);
+            if (different) {
+                value1_label.add_css_class("warning");
+            }
+            value1_box.append(value1_label);
+
+            var value2_box = new Box(Orientation.VERTICAL, 0);
+            var value2_label = new Label(value2);
+            value2_label.set_xalign(0);
+            value2_label.set_wrap(true);
+            value2_label.set_wrap_mode(Pango.WrapMode.WORD_CHAR);
+            if (different) {
+                value2_label.add_css_class("warning");
+            }
+            value2_box.append(value2_label);
+
+            values_box.append(value1_box);
+            values_box.append(value2_box);
+            box.append(values_box);
+
+            return box;
+        }
+
+        private Box _create_comparison_text_section(string label, string text1, string text2) {
+            var box = new Box(Orientation.VERTICAL, 6);
+
+            var label_widget = new Label(label);
+            label_widget.add_css_class("heading");
+            label_widget.set_xalign(0);
+            box.append(label_widget);
+
+            var text_box = new Box(Orientation.HORIZONTAL, 12);
+            text_box.set_homogeneous(true);
+
+            // Text view 1
+            var scrolled1 = new ScrolledWindow();
+            scrolled1.set_vexpand(true);
+            scrolled1.set_min_content_height(150);
+            var text_view1 = new TextView();
+            text_view1.set_editable(false);
+            text_view1.set_monospace(true);
+            text_view1.set_wrap_mode(Gtk.WrapMode.WORD_CHAR);
+            text_view1.get_buffer().set_text(text1, -1);
+            scrolled1.set_child(text_view1);
+
+            // Text view 2
+            var scrolled2 = new ScrolledWindow();
+            scrolled2.set_vexpand(true);
+            scrolled2.set_min_content_height(150);
+            var text_view2 = new TextView();
+            text_view2.set_editable(false);
+            text_view2.set_monospace(true);
+            text_view2.set_wrap_mode(Gtk.WrapMode.WORD_CHAR);
+            text_view2.get_buffer().set_text(text2, -1);
+            scrolled2.set_child(text_view2);
+
+            text_box.append(scrolled1);
+            text_box.append(scrolled2);
+            box.append(text_box);
+
+            return box;
         }
     }
 }

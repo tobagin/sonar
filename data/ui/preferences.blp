@@ -86,4 +86,87 @@ template $SonarPreferencesDialog : Adw.PreferencesDialog {
       }
     }
   }
+
+  Adw.PreferencesPage {
+    title: "Forwarding";
+    icon-name: "send-to-symbolic";
+
+    Adw.PreferencesGroup {
+      title: "Webhook Forwarding";
+      description: "Automatically forward incoming webhooks to external URLs";
+
+      Adw.ActionRow {
+        title: "Enable Forwarding";
+        subtitle: "Forward all incoming webhooks to configured URLs";
+        activatable-widget: enable_forwarding_switch;
+
+        [suffix]
+        Switch enable_forwarding_switch {
+          valign: center;
+        }
+      }
+    }
+
+    Adw.PreferencesGroup forwarding_urls_group {
+      title: "Forward URLs";
+      description: "Add URLs to forward webhooks to (one per line)";
+
+      Adw.ActionRow {
+        [suffix]
+        Box {
+          orientation: vertical;
+          spacing: 6;
+          vexpand: true;
+
+          ScrolledWindow {
+            height-request: 150;
+            vexpand: true;
+
+            TextView forwarding_urls_textview {
+              monospace: true;
+              top-margin: 6;
+              bottom-margin: 6;
+              left-margin: 6;
+              right-margin: 6;
+            }
+          }
+
+          Label {
+            label: "Enter one URL per line (e.g., https://example.com/webhook)";
+            halign: start;
+
+            styles ["dim-label", "caption"]
+          }
+        }
+      }
+    }
+
+    Adw.PreferencesGroup {
+      title: "Forwarding Options";
+
+      Adw.ActionRow {
+        title: "Forward Method";
+        subtitle: "Preserve original HTTP method or use POST for all";
+        activatable-widget: preserve_method_switch;
+
+        [suffix]
+        Switch preserve_method_switch {
+          valign: center;
+          active: true;
+        }
+      }
+
+      Adw.ActionRow {
+        title: "Forward Headers";
+        subtitle: "Include original request headers when forwarding";
+        activatable-widget: forward_headers_switch;
+
+        [suffix]
+        Switch forward_headers_switch {
+          valign: center;
+          active: true;
+        }
+      }
+    }
+  }
 }
