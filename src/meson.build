@@ -1,14 +1,14 @@
 # Vala sources
 vala_sources = [
-  'application.vala',
-  'main_window.vala',
-  'models.vala',
-  'server.vala',
-  'tunnel.vala',
-  'request_row.vala',
-  'preferences_dialog.vala',
-  'shortcuts_dialog.vala',
-  'statistics_dialog.vala',
+  'Application.vala',
+  'MainWindow.vala',
+  'models/Models.vala',
+  'managers/Server.vala',
+  'managers/Tunnel.vala',
+  'utils/RequestRow.vala',
+  'dialogs/PreferencesDialog.vala',
+  'dialogs/ShortcutsDialog.vala',
+  'dialogs/StatisticsDialog.vala',
 ]
 
 # Dependencies

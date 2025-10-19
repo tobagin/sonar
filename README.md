@@ -185,11 +185,11 @@ Automatically forward all incoming webhooks:
 
 | Main Window | Tunnel Started | Received Requests |
 |-------------|----------------|-------------------|
-| ![Main Window](screenshots/main-window-start-tunnel.png) | ![Tunnel Started](screenshots/main-window-tunnel-started.png) | ![Received Requests](screenshots/received-requests.png) |
+| ![Main Window](data/screenshots/main-window-start-tunnel.png) | ![Tunnel Started](data/screenshots/main-window-tunnel-started.png) | ![Received Requests](data/screenshots/received-requests.png) |
 
 | History View | Setup Required | About Dialog |
 |-------------|----------------|-------------|
-| ![History](screenshots/history.png) | ![Setup](screenshots/main-window-setup-required.png) | ![About](screenshots/about.png) |
+| ![History](data/screenshots/history.png) | ![Setup](data/screenshots/main-window-setup-required.png) | ![About](data/screenshots/about.png) |
 
 ## 🛠️ Development
 
