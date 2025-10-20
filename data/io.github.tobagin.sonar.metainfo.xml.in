@@ -87,6 +87,51 @@
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
 
   <releases>
+    <release version="2.2.0" date="2025-10-20">
+      <description>
+        <p>🔒 Security &amp; Performance Enhancement Release</p>
+        <p>This release focuses on security hardening, performance optimizations, and enhanced export capabilities.</p>
+        <p>🔐 Security Hardening:</p>
+        <ul>
+          <li>Secure credential storage using GNOME Keyring (libsecret)</li>
+          <li>DoS protection with configurable rate limiting (100 req/s, burst 200)</li>
+          <li>SSRF prevention with URL validation and private IP filtering</li>
+          <li>Comprehensive input validation for all webhook data</li>
+          <li>Webhook signature validation for GitHub, Stripe, and custom HMAC</li>
+          <li>Timing-safe signature comparison to prevent timing attacks</li>
+        </ul>
+        <p>⚡ Performance Optimizations:</p>
+        <ul>
+          <li>O(1) request indexing for instant lookups</li>
+          <li>Batched UI updates (100ms intervals) for smooth 60fps rendering</li>
+          <li>JSON parsing cache to avoid redundant parsing</li>
+          <li>Async disk I/O to prevent UI freezing</li>
+          <li>Improved memory management with LRU eviction strategies</li>
+        </ul>
+        <p>📤 Enhanced Export Formats:</p>
+        <ul>
+          <li>HAR (HTTP Archive) format export for compatibility</li>
+          <li>CSV export with customizable fields</li>
+          <li>Enhanced cURL export with proper authentication headers</li>
+          <li>Selective export (export specific requests)</li>
+        </ul>
+        <p>🛠️ Reliability &amp; Testing:</p>
+        <ul>
+          <li>Exponential backoff retry for tunnel connection (3 attempts)</li>
+          <li>Comprehensive test suite with 4 automated test scripts</li>
+          <li>Security testing suite for validation and rate limiting</li>
+          <li>Performance benchmarking tools</li>
+          <li>Complete testing documentation</li>
+        </ul>
+        <p>🐛 Bug Fixes:</p>
+        <ul>
+          <li>Fixed subprocess assertion error when checking ngrok process</li>
+          <li>Fixed path validation false positives</li>
+          <li>Fixed GLib-GIO-CRITICAL warnings</li>
+          <li>Webhook server now starts automatically</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.1.0" date="2025-10-09">
       <description>
         <p>🚀 Major Feature Release - Advanced Webhook Tools</p>

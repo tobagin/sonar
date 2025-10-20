@@ -5,6 +5,8 @@ flatpak-build
 build/
 repo
 .pytest_cache
+test-scripts/
+
 
 # Generated files
 *.metainfo.xml.configured

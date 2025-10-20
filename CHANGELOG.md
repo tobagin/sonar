@@ -5,6 +5,50 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2025-10-20
+
+### Added
+- **Security Hardening**: Secure credential storage using libsecret (GNOME Keyring)
+- **Security**: DoS protection with configurable rate limiting (100 req/s, burst 200)
+- **Security**: SSRF prevention with URL validation and private IP filtering
+- **Security**: Comprehensive input validation for all webhook data
+- **Security**: Webhook signature validation for GitHub, Stripe, and custom HMAC
+- **Performance**: O(1) request indexing for instant lookups
+- **Performance**: Batched UI updates (100ms intervals) for smooth 60fps rendering
+- **Performance**: JSON parsing cache to avoid redundant parsing
+- **Performance**: Async disk I/O to prevent UI freezing
+- **Export**: HAR (HTTP Archive) format export
+- **Export**: CSV export with customizable fields
+- **Export**: Enhanced cURL export with proper authentication headers
+- **Export**: Selective export (export specific requests)
+- **Feature**: Request filtering by method, content-type, time, and starred status
+- **Feature**: Request comparison to see differences between webhooks
+- **Reliability**: Exponential backoff retry for tunnel connection (3 attempts)
+- **Testing**: Comprehensive test suite with 4 automated test scripts
+- **Testing**: Security testing suite for validation and rate limiting
+- **Testing**: Performance benchmarking tools
+- **Documentation**: Complete testing guide (TESTING_GUIDE.md)
+- **Documentation**: Quick start testing guide (QUICK_START_TESTING.md)
+
+### Changed
+- Webhook server now starts automatically on application launch
+- Improved memory management with LRU eviction strategies
+- Enhanced error handling with detailed validation messages
+- Better tunnel status UI with retry feedback
+
+### Fixed
+- Subprocess assertion error when checking ngrok process status
+- Path validation false positives from buggy null byte detection
+- GLib-GIO-CRITICAL warnings in tunnel management
+- Circular reference crash in component initialization
+
+### Security
+- Migrated from plaintext credential storage to encrypted GNOME Keyring
+- Added rate limiting to prevent DoS attacks
+- Implemented SSRF protection for webhook forwarding
+- Added timing-safe signature comparison to prevent timing attacks
+- URL-encoded control character validation
+
 ## [2.1.0] - 2025-10-09
 
 ### Added
@@ -138,6 +182,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Persistent request history with JSON storage
 - Support for multiple content types (JSON, XML, form-data)
 
+[2.2.0]: https://github.com/tobagin/sonar/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/tobagin/sonar/compare/v2.0.3...v2.1.0
 [2.0.3]: https://github.com/tobagin/sonar/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/tobagin/sonar/compare/v2.0.1...v2.0.2

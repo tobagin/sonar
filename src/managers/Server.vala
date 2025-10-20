@@ -13,6 +13,7 @@ namespace Sonar {
     public class WebhookServer : Object {
         private Soup.Server server;
         private RequestStorage storage;
+        private RateLimiter rate_limiter;
         private int port;
         private string host;
         private bool is_running;
@@ -25,9 +26,10 @@ namespace Sonar {
         private bool forward_headers = true;
 
         public signal void request_received(WebhookRequest request);
-        
+
         public WebhookServer(RequestStorage request_storage) {
             this.storage = request_storage;
+            this.rate_limiter = new RateLimiter(100, 200, 1000); // 100 req/s, burst 200, track 1000 sources
             this.port = 8000;
             this.host = "127.0.0.1";
             this.is_running = false;
@@ -76,7 +78,19 @@ namespace Sonar {
                 if (path == "/" || path == "/health") {
                     return;
                 }
-                
+
+                // Rate limiting check (use path as identifier for per-endpoint limiting)
+                if (!this.rate_limiter.check_rate_limit(path)) {
+                    var error_response = """{
+    "status": "error",
+    "message": "Rate limit exceeded",
+    "retry_after": 1
+}""";
+                    msg.set_status(429, null);
+                    msg.set_response("application/json", Soup.MemoryUse.COPY, error_response.data);
+                    return;
+                }
+
                 var method = msg.get_method();
                 var headers = new HashTable<string, string>(str_hash, str_equal);
                 var query_params = new HashTable<string, string>(str_hash, str_equal);
@@ -232,93 +246,101 @@ namespace Sonar {
                                           out bool is_valid,
                                           out HashTable<string, Value?> sanitized_data,
                                           out string[] warnings) {
-            
+
             is_valid = true;
             var warnings_list = new Gee.ArrayList<string>();
             sanitized_data = new HashTable<string, Value?>(str_hash, str_equal);
-            
+
+            // Initialize ValidationUtils
+            ValidationUtils.initialize();
+
             // Validate and sanitize method
-            string clean_method = method.up().strip();
-            if (clean_method.length == 0) {
-                is_valid = false;
-                warnings_list.add("Empty HTTP method");
-            } else if (clean_method.length > 10) {
-                warnings_list.add("HTTP method too long, truncated");
-                clean_method = clean_method.substring(0, 10);
+            string clean_method;
+            string? method_error;
+            bool method_valid = ValidationUtils.validate_method(method, out clean_method, out method_error);
+            if (!method_valid) {
+                if (method_error != null) {
+                    warnings_list.add(method_error);
+                }
+                if (clean_method.length == 0) {
+                    is_valid = false;
+                }
             }
             sanitized_data.set("method", clean_method);
-            
+
             // Validate and sanitize path
-            string clean_path = path.strip();
-            if (clean_path.length == 0) {
-                clean_path = "/";
-            } else if (clean_path.length > 2048) {
-                warnings_list.add("Path too long, truncated");
-                clean_path = clean_path.substring(0, 2048);
-            }
-            // Basic path sanitization
-            if (!clean_path.has_prefix("/")) {
-                clean_path = "/" + clean_path;
+            string clean_path;
+            string? path_error;
+            bool path_valid = ValidationUtils.validate_path(path, out clean_path, out path_error);
+            if (!path_valid) {
+                if (path_error != null) {
+                    warnings_list.add(path_error);
+                    // Path traversal attempts are critical - reject the request
+                    if (path_error.contains("path traversal") || path_error.contains("dangerous characters")) {
+                        is_valid = false;
+                    }
+                }
             }
             sanitized_data.set("path", clean_path);
-            
-            // Sanitize headers
-            var clean_headers = new HashTable<string, string>(str_hash, str_equal);
-            headers.foreach((key, value) => {
-                string clean_key = key.strip().down();
-                string clean_value = value.strip();
-                
-                if (clean_key.length > 0 && clean_key.length <= 128 && 
-                    clean_value.length <= 8192) {
-                    clean_headers.set(clean_key, clean_value);
-                }
-            });
+
+            // Validate and sanitize headers
+            HashTable<string, string> clean_headers;
+            string[] header_warnings;
+            ValidationUtils.validate_headers(headers, out clean_headers, out header_warnings);
+            foreach (var warning in header_warnings) {
+                warnings_list.add(warning);
+            }
             // Convert HashTable to Variant
             var headers_variant_builder = new VariantBuilder(new VariantType("a{ss}"));
             clean_headers.foreach((key, val) => {
                 headers_variant_builder.add("{ss}", key, val);
             });
             sanitized_data.set("headers", headers_variant_builder.end());
-            
-            // Sanitize body
-            string clean_body = body;
-            if (clean_body.length > 1048576) { // 1MB limit
-                warnings_list.add("Request body too large, truncated to 1MB");
-                clean_body = clean_body.substring(0, 1048576);
+
+            // Validate and sanitize body
+            string clean_body;
+            string? body_warning;
+            int64 max_body_size = 10485760; // 10MB default
+            ValidationUtils.validate_body_size(body, max_body_size, out clean_body, out body_warning);
+            if (body_warning != null) {
+                warnings_list.add(body_warning);
             }
             sanitized_data.set("body", clean_body);
-            
-            // Sanitize query params
-            var clean_query_params = new HashTable<string, string>(str_hash, str_equal);
-            query_params.foreach((key, value) => {
-                string clean_key = key.strip();
-                string clean_value = value.strip();
-                
-                if (clean_key.length > 0 && clean_key.length <= 128 && 
-                    clean_value.length <= 2048) {
-                    clean_query_params.set(clean_key, clean_value);
-                }
-            });
+
+            // Validate and sanitize query params
+            HashTable<string, string> clean_query_params;
+            string[] query_warnings;
+            ValidationUtils.validate_query_params(query_params, out clean_query_params, out query_warnings);
+            foreach (var warning in query_warnings) {
+                warnings_list.add(warning);
+            }
             // Convert HashTable to Variant
             var query_variant_builder = new VariantBuilder(new VariantType("a{ss}"));
             clean_query_params.foreach((key, val) => {
                 query_variant_builder.add("{ss}", key, val);
             });
             sanitized_data.set("query_params", query_variant_builder.end());
-            
-            // Sanitize content type
-            if (content_type != null) {
-                string clean_content_type = content_type.strip();
-                if (clean_content_type.length > 0 && clean_content_type.length <= 256) {
-                    sanitized_data.set("content_type", clean_content_type);
-                }
+
+            // Validate and sanitize content type
+            string? clean_content_type;
+            bool content_type_valid = ValidationUtils.validate_content_type(content_type, out clean_content_type);
+            if (!content_type_valid && content_type != null) {
+                warnings_list.add("Invalid or too long content type");
             }
-            
+            if (clean_content_type != null) {
+                sanitized_data.set("content_type", clean_content_type);
+            }
+
             // Validate content length
             if (content_length >= 0) {
+                var security_mgr = SecurityManager.get_default();
+                if (!security_mgr.validate_body_size(content_length, max_body_size)) {
+                    warnings_list.add(@"Content-Length header indicates size exceeds limit: $(content_length) bytes");
+                    // Don't reject, as we already truncated the body
+                }
                 sanitized_data.set("content_length", content_length);
             }
-            
+
             // Convert warnings list to array
             warnings = warnings_list.to_array();
         }
@@ -369,8 +391,21 @@ namespace Sonar {
         }
 
         public void set_forward_urls(Gee.ArrayList<string> urls) {
-            this.forward_urls = urls;
-            debug("Set %d forward URLs", urls.size);
+            // Validate all URLs before setting
+            var validated_urls = new Gee.ArrayList<string>();
+            foreach (var url in urls) {
+                string? error;
+                // Allow private IPs by default for development, but log warning
+                bool is_valid = ValidationUtils.validate_forward_url(url, true, out error);
+                if (is_valid) {
+                    validated_urls.add(url);
+                } else {
+                    warning("Skipping invalid forward URL '%s': %s", url, error ?? "Unknown error");
+                }
+            }
+
+            this.forward_urls = validated_urls;
+            debug("Set %d forward URLs (%d validated)", urls.size, validated_urls.size);
         }
 
         public Gee.ArrayList<string> get_forward_urls() {
@@ -424,6 +459,23 @@ namespace Sonar {
                     warning("Failed to forward to %s: %s", url, e.message);
                 }
             }
+        }
+
+        // Rate Limiter API
+        public void set_rate_limiting_enabled(bool enabled) {
+            this.rate_limiter.set_enabled(enabled);
+        }
+
+        public bool is_rate_limiting_enabled() {
+            return this.rate_limiter.is_enabled();
+        }
+
+        public void configure_rate_limit(int requests_per_second, int burst_size) {
+            this.rate_limiter.configure(requests_per_second, burst_size);
+        }
+
+        public RateLimiter get_rate_limiter() {
+            return this.rate_limiter;
         }
     }
 }

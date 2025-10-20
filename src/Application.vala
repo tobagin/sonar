@@ -27,18 +27,26 @@ namespace Sonar {
         
         public override void startup() {
             base.startup();
-            
+
             // Initialize core components
             this.storage = new RequestStorage();
             this.server = new WebhookServer(this.storage);
             this.tunnel_manager = new TunnelManager();
-            
+
+            // Start the webhook server
+            try {
+                this.server.start(8000, "127.0.0.1");
+                info("Webhook server started on http://127.0.0.1:8000");
+            } catch (Error e) {
+                critical("Failed to start webhook server: %s", e.message);
+            }
+
             this._setup_actions();
             this._setup_resources();
-            
+
             // Connect to tunnel status changes to update copy URL action
             this.tunnel_manager.status_changed.connect(this._on_tunnel_status_changed_for_actions);
-            
+
             // Set initial state based on current tunnel status
             var initial_status = this.tunnel_manager.get_status();
             this._on_tunnel_status_changed_for_actions(initial_status);

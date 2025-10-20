@@ -14,26 +14,30 @@ namespace Sonar {
         private Subprocess? ngrok_process;
         private TunnelStatus _status;
         private Mutex status_lock;
-        private Settings settings;
+        private SecurityManager security_manager;
         private bool auth_token_set;
         private Cancellable? api_cancellable;
-        
+        private bool migration_complete;
+
+        // Retry configuration
+        private const int MAX_RETRY_ATTEMPTS = 3;
+        private const int INITIAL_RETRY_DELAY_MS = 1000;  // 1 second
+        private int current_retry_attempt = 0;
+
         public signal void status_changed(TunnelStatus status);
-        
+        public signal void retry_progress(int attempt, int max_attempts, int delay_ms);
+
         public TunnelManager() {
             this._status = new TunnelStatus();
             this.status_lock = Mutex();
             this.ngrok_process = null;
             this.auth_token_set = false;
             this.api_cancellable = new Cancellable();
-            
-            // Initialize GSettings
-            try {
-                this.settings = new Settings(Config.APP_ID);
-            } catch (Error e) {
-                warning("Failed to initialize GSettings: %s", e.message);
-            }
-            
+            this.migration_complete = false;
+
+            // Initialize SecurityManager
+            this.security_manager = SecurityManager.get_default();
+
             // Check if ngrok is available
             if (!this._check_ngrok_installation()) {
                 this._status = new TunnelStatus.with_error(
@@ -41,16 +45,15 @@ namespace Sonar {
                 );
                 return;
             }
-            
-            // Configure ngrok auth token
-            var auth_token = this._load_auth_token();
-            if (auth_token != null) {
-                this._set_auth_token_internal(auth_token);
-            } else {
-                this._status = new TunnelStatus.with_error(
-                    "No NGROK_AUTHTOKEN found. Set NGROK_AUTHTOKEN to use tunnel features."
-                );
-            }
+
+            // Migrate token from GSettings to secure storage (async, will complete in background)
+            this._migrate_token_async.begin((obj, res) => {
+                this._migrate_token_async.end(res);
+                this.migration_complete = true;
+
+                // After migration, try to load and configure token
+                this._load_and_configure_token_async.begin();
+            });
         }
         
         private bool _check_ngrok_installation() {
@@ -64,68 +67,98 @@ namespace Sonar {
             }
         }
         
-        private string? _load_auth_token() {
+        private async void _migrate_token_async() {
+            try {
+                bool migrated = yield this.security_manager.migrate_ngrok_token();
+                if (migrated) {
+                    debug("Token migration completed");
+                }
+            } catch (GLib.Error e) {
+                warning("Token migration failed: %s", e.message);
+            }
+        }
+
+        private async void _load_and_configure_token_async() {
+            var auth_token = yield this._load_auth_token_async();
+            if (auth_token != null) {
+                this._set_auth_token_internal(auth_token);
+            } else {
+                this.status_lock.lock();
+                this._status = new TunnelStatus.with_error(
+                    "No NGROK_AUTHTOKEN found. Set NGROK_AUTHTOKEN to use tunnel features."
+                );
+                this.status_lock.unlock();
+                this.status_changed(this._status);
+            }
+        }
+
+        private async string? _load_auth_token_async() {
             // First try environment variable
             string? auth_token = Environment.get_variable("NGROK_AUTHTOKEN");
             if (auth_token != null && auth_token.length > 0) {
                 return auth_token;
             }
-            
-            // Then try GSettings
+
+            // Then try secure storage via SecurityManager
             try {
-                if (this.settings != null) {
-                    auth_token = this.settings.get_string("ngrok-auth-token");
-                    if (auth_token != null && auth_token.length > 0) {
-                        Environment.set_variable("NGROK_AUTHTOKEN", auth_token, true);
-                        return auth_token;
-                    }
+                auth_token = yield this.security_manager.retrieve_credential("ngrok-auth-token");
+                if (auth_token != null && auth_token.length > 0) {
+                    Environment.set_variable("NGROK_AUTHTOKEN", auth_token, true);
+                    return auth_token;
                 }
-            } catch (Error e) {
-                warning("Failed to load auth token from GSettings: %s", e.message);
+            } catch (GLib.Error e) {
+                warning("Failed to load auth token from secure storage: %s", e.message);
             }
-            
+
             return null;
         }
         
         public bool set_auth_token(string token) {
-            this.status_lock.lock();
-            
-            try {
-                // Validate token format (basic validation)
-                if (token.length < 10) {
-                    this._status = new TunnelStatus.with_error("Invalid auth token: too short");
-                    this.status_lock.unlock();
-                    this.status_changed(this._status);
-                    return false;
-                }
-                
-                bool success = this._set_auth_token_internal(token);
-                if (success) {
-                    // Save to GSettings for persistence
-                    if (this.settings != null) {
-                        this.settings.set_string("ngrok-auth-token", token);
-                    }
-                    
-                    // Set environment variable
-                    Environment.set_variable("NGROK_AUTHTOKEN", token, true);
-                    
-                    // Reset status to clear any previous errors
-                    this._status = new TunnelStatus();
-                    info("Ngrok auth token set successfully");
-                } else {
-                    this._status = new TunnelStatus.with_error("Failed to set ngrok auth token");
-                }
-                
-                this.status_lock.unlock();
-                this.status_changed(this._status);
-                return success;
-                
-            } catch (Error e) {
-                this._status = new TunnelStatus.with_error(@"Failed to set ngrok auth token: $(e.message)");
+            // Validate token format (basic validation)
+            if (token.length < 10) {
+                this.status_lock.lock();
+                this._status = new TunnelStatus.with_error("Invalid auth token: too short");
                 this.status_lock.unlock();
                 this.status_changed(this._status);
                 return false;
             }
+
+            bool success = this._set_auth_token_internal(token);
+            if (success) {
+                // Store token securely in background (fire and forget)
+                this._store_auth_token_async.begin(token, (obj, res) => {
+                    try {
+                        this._store_auth_token_async.end(res);
+                    } catch (GLib.Error e) {
+                        warning("Failed to store token securely: %s", e.message);
+                    }
+                });
+
+                // Set environment variable
+                Environment.set_variable("NGROK_AUTHTOKEN", token, true);
+
+                this.status_lock.lock();
+                // Reset status to clear any previous errors
+                this._status = new TunnelStatus();
+                this.status_lock.unlock();
+                info("Ngrok auth token set successfully");
+                this.status_changed(this._status);
+                return true;
+            } else {
+                this.status_lock.lock();
+                this._status = new TunnelStatus.with_error("Failed to set ngrok auth token");
+                this.status_lock.unlock();
+                this.status_changed(this._status);
+                return false;
+            }
+        }
+
+        private async void _store_auth_token_async(string token) throws GLib.Error {
+            yield this.security_manager.store_credential(
+                "ngrok-auth-token",
+                token,
+                "Ngrok Authentication Token"
+            );
         }
         
         private bool _set_auth_token_internal(string token) {
@@ -147,14 +180,26 @@ namespace Sonar {
             }
         }
         
-        public TunnelStatus refresh_auth_token() {
+        public void refresh_auth_token() {
             this.status_lock.lock();
-            
+
             // Reset auth token flag first
             this.auth_token_set = false;
-            
+
+            this.status_lock.unlock();
+
+            // Load and configure token async
+            this._refresh_auth_token_async.begin((obj, res) => {
+                this._refresh_auth_token_async.end(res);
+            });
+        }
+
+        private async void _refresh_auth_token_async() {
             // Try to load auth token again
-            var auth_token = this._load_auth_token();
+            var auth_token = yield this._load_auth_token_async();
+
+            this.status_lock.lock();
+
             if (auth_token != null) {
                 bool success = this._set_auth_token_internal(auth_token);
                 if (success) {
@@ -168,21 +213,81 @@ namespace Sonar {
                     "No NGROK_AUTHTOKEN found. Set NGROK_AUTHTOKEN to use tunnel features."
                 );
             }
-            
+
             this.status_lock.unlock();
             this.status_changed(this._status);
-            return this._status;
         }
         
-        public async TunnelStatus start_async(int port = 8000, string protocol = "http") {
+        public async TunnelStatus start_async(int port = 8000, string protocol = "http", Cancellable? cancellable = null) {
+            // Retry logic with exponential backoff
+            this.current_retry_attempt = 0;
+            TunnelStatus? last_status = null;
+
+            while (this.current_retry_attempt < MAX_RETRY_ATTEMPTS) {
+                // Try to start the tunnel
+                last_status = yield this._start_async_internal(port, protocol, cancellable);
+
+                // If successful, reset retry counter and return
+                if (last_status.active) {
+                    this.current_retry_attempt = 0;
+                    return last_status;
+                }
+
+                // If cancelled or auth error, don't retry
+                if (cancellable != null && cancellable.is_cancelled()) {
+                    return last_status;
+                }
+
+                if (last_status.error != null &&
+                    (last_status.error.contains("auth token") ||
+                     last_status.error.contains("Invalid port"))) {
+                    // Don't retry auth or validation errors
+                    return last_status;
+                }
+
+                // Increment retry attempt
+                this.current_retry_attempt++;
+
+                // If we haven't reached max attempts, wait with exponential backoff
+                if (this.current_retry_attempt < MAX_RETRY_ATTEMPTS) {
+                    int delay_ms = INITIAL_RETRY_DELAY_MS * (1 << (this.current_retry_attempt - 1));
+                    warning("Tunnel start failed (attempt %d/%d), retrying in %dms: %s",
+                            this.current_retry_attempt, MAX_RETRY_ATTEMPTS, delay_ms,
+                            last_status.error ?? "unknown error");
+
+                    // Emit retry progress signal
+                    retry_progress(this.current_retry_attempt, MAX_RETRY_ATTEMPTS, delay_ms);
+
+                    // Wait before retrying
+                    if (cancellable != null && cancellable.is_cancelled()) {
+                        return last_status;
+                    }
+
+                    // Use a proper async wait
+                    yield this._wait_before_retry_async(delay_ms);
+                }
+            }
+
+            // All retries exhausted
             this.status_lock.lock();
-            
+            this._status = new TunnelStatus.with_error(
+                @"Failed to start tunnel after $(MAX_RETRY_ATTEMPTS) attempts: $(last_status != null ? last_status.error : "unknown error")"
+            );
+            this.status_lock.unlock();
+            this.status_changed(this._status);
+            this.current_retry_attempt = 0;
+            return this._status;
+        }
+
+        private async TunnelStatus _start_async_internal(int port, string protocol, Cancellable? cancellable) {
+            this.status_lock.lock();
+
             if (this._status.active) {
                 warning("Tunnel is already active");
                 this.status_lock.unlock();
                 return this._status;
             }
-            
+
             // Validate port
             if (port < 1 || port > 65535) {
                 this._status = new TunnelStatus.with_error(@"Invalid port: $(port)");
@@ -190,7 +295,7 @@ namespace Sonar {
                 this.status_changed(this._status);
                 return this._status;
             }
-            
+
             // Check if auth token is set
             if (!this.auth_token_set) {
                 this._status = new TunnelStatus.with_error(
@@ -200,28 +305,28 @@ namespace Sonar {
                 this.status_changed(this._status);
                 return this._status;
             }
-            
+
             try {
                 info("Starting ngrok tunnel on port %d...", port);
-                
+
                 // Start ngrok process with proper flags
                 this.ngrok_process = new Subprocess(
                     SubprocessFlags.STDOUT_PIPE | SubprocessFlags.STDERR_PIPE,
                     "ngrok", protocol, port.to_string(), "--log=stdout"
                 );
-                
+
                 this.status_lock.unlock();
-                
+
                 // Wait for ngrok to be ready by checking API availability
                 var public_url = yield this._wait_for_ngrok_ready_async();
-                
+
                 // If we still don't have a URL, try the API directly one more time
                 if (public_url == null) {
                     public_url = yield this._get_tunnel_url_async();
                 }
-                
+
                 this.status_lock.lock();
-                
+
                 if (public_url != null) {
                     this._status = new TunnelStatus.with_url(public_url);
                     info("Ngrok tunnel started: %s", public_url);
@@ -229,11 +334,11 @@ namespace Sonar {
                     this._status = new TunnelStatus.with_error("Failed to get tunnel URL from ngrok API");
                     this._stop_process();
                 }
-                
+
                 this.status_lock.unlock();
                 this.status_changed(this._status);
                 return this._status;
-                
+
             } catch (Error e) {
                 this.status_lock.lock();
                 critical("Failed to start ngrok tunnel: %s", e.message);
@@ -245,27 +350,35 @@ namespace Sonar {
             }
         }
         
+        private async void _wait_before_retry_async(int delay_ms) {
+            Timeout.add(delay_ms, () => {
+                this._wait_before_retry_async.callback();
+                return Source.REMOVE;
+            });
+            yield;
+        }
+
         public void stop() {
             this.status_lock.lock();
-            
+
             if (!this._status.active && this.ngrok_process == null) {
                 info("Tunnel is not active");
                 this.status_lock.unlock();
                 return;
             }
-            
+
             try {
                 info("Stopping ngrok tunnel...");
                 this._stop_process();
-                
+
                 this._status = new TunnelStatus();
                 info("Ngrok tunnel stopped successfully");
-                
+
             } catch (Error e) {
                 warning("Error stopping tunnel: %s", e.message);
                 this._status = new TunnelStatus.with_error(@"Error stopping tunnel: $(e.message)");
             }
-            
+
             this.status_lock.unlock();
             this.status_changed(this._status);
         }
@@ -347,22 +460,18 @@ namespace Sonar {
             // Wait up to 10 seconds for ngrok to be ready
             for (int i = 0; i < 20; i++) {
                 yield this._wait_async(500); // Wait 500ms between checks
-                
-                // Check if the process has exited (only once to avoid assertion errors)
+
+                // Check if the process is still running by checking if identifier is non-null
                 if (this.ngrok_process != null && !process_checked) {
-                    try {
-                        if (this.ngrok_process.get_if_exited()) {
-                            int exit_code = this.ngrok_process.get_exit_status();
-                            warning("Ngrok process exited with code: %d", exit_code);
-                            process_checked = true;
-                            return null;
-                        }
-                    } catch (Error e) {
-                        // Process might still be running, continue
+                    string? pid = this.ngrok_process.get_identifier();
+                    if (pid == null) {
+                        warning("Ngrok process appears to have exited");
+                        process_checked = true;
+                        return null;
                     }
                     process_checked = true;
                 }
-                
+
                 // Try to get tunnel URL from API
                 var url = yield this._get_tunnel_url_async();
                 if (url != null) {

@@ -20,9 +20,10 @@ Sonar is a native GTK4 application that provides a beautiful, intuitive interfac
 - **🔄 Request Replay**: Resend any webhook to custom URLs with full control
 - **⚖️ Request Comparison**: Side-by-side diff of two webhooks to spot differences
 - **📝 Request Templates**: Save requests as reusable templates for testing
-- **🔀 Webhook Forwarding**: Automatically forward webhooks to multiple URLs
-- **🎯 Advanced Filtering**: Filter by method, content-type, time range, and search text
-- **📤 Export Options**: Export as JSON, cURL command, or HTTP format
+- **🔀 Webhook Forwarding**: Automatically forward webhooks to multiple URLs (with SSRF protection)
+- **🎯 Advanced Filtering**: Filter by method, content-type, path, and full-text search
+- **📤 Professional Export**: Export as HAR, CSV, cURL commands, or JSON format
+- **🔒 Rate Limiting**: Built-in DoS protection (100 req/s per endpoint, configurable)
 
 ### Developer Tools
 - **📊 Analytics Dashboard**: View detailed statistics about your webhook history
@@ -30,10 +31,23 @@ Sonar is a native GTK4 application that provides a beautiful, intuitive interfac
 - **💾 Persistent History**: All requests saved to disk with JSON storage
 - **⌨️ Keyboard Shortcuts**: Comprehensive keyboard shortcuts for productivity
 
-### Technical Excellence
-- **⚡ Fast & Lightweight**: Native GTK4 application with minimal resource usage
+### Security & Performance (v2.2.0)
+- **🔒 Enterprise-Grade Security**:
+  - Encrypted credential storage via GNOME Keyring (libsecret)
+  - DoS protection with configurable rate limiting (100 req/s, burst 200)
+  - SSRF prevention with URL validation and private IP filtering
+  - Webhook signature validation (GitHub, Stripe, custom HMAC)
+  - Timing-safe signature comparison to prevent timing attacks
+  - Comprehensive input validation and sanitization
+  - Path traversal protection
+- **⚡ High Performance**:
+  - O(1) request indexing for instant lookups
+  - Batched UI updates (100ms intervals) for smooth 60fps rendering
+  - JSON parsing cache to avoid redundant parsing
+  - Async disk I/O to prevent UI freezing
+  - Native GTK4 application with minimal resource usage
+  - Improved memory management with LRU eviction
 - **🎨 Modern Design**: Clean Libadwaita interface that integrates perfectly with GNOME
-- **🔒 Secure**: Runs sandboxed via Flatpak with minimal required permissions
 
 ## 🚀 Installation
 
@@ -58,6 +72,7 @@ cd sonar
 - libsoup 3.0+ development libraries
 - json-glib 1.6+ development libraries
 - libgee 0.8+ development libraries
+- libsecret 0.20+ development libraries (for encrypted credentials)
 - Meson build system (>= 1.0.0)
 - Blueprint compiler
 
@@ -87,6 +102,8 @@ brew install ngrok/ngrok/ngrok  # macOS
 1. Sign up at [ngrok.com](https://ngrok.com) (free account available)
 2. Get your auth token from the dashboard
 3. Launch Sonar and click "Setup Ngrok Token" to configure
+
+**Note**: Your ngrok token is stored **encrypted** in your system keyring for security. Sonar never stores credentials in plain text.
 
 ## 📖 Usage
 

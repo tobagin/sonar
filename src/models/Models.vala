@@ -21,6 +21,9 @@ namespace Sonar {
         public string? content_type { get; set; }
         public int64 content_length { get; set; default = -1; }
         public bool is_starred { get; set; default = false; }
+
+        // Cache for formatted body (performance optimization)
+        private string? _cached_formatted_body = null;
         
         public WebhookRequest() {
             this.id = Uuid.string_random();
@@ -51,10 +54,16 @@ namespace Sonar {
         }
         
         public string get_formatted_body() {
+            // Return cached version if available
+            if (_cached_formatted_body != null) {
+                return _cached_formatted_body;
+            }
+
             if (body.length == 0) {
+                _cached_formatted_body = "";
                 return "";
             }
-            
+
             // Try to parse as JSON for pretty formatting
             try {
                 var parser = new Json.Parser();
@@ -63,9 +72,11 @@ namespace Sonar {
                 gen.set_root(parser.get_root());
                 gen.pretty = true;
                 gen.indent = 2;
-                return gen.to_data(null);
+                _cached_formatted_body = gen.to_data(null);
+                return _cached_formatted_body;
             } catch (Error e) {
                 // Return as-is if not valid JSON
+                _cached_formatted_body = body;
                 return body;
             }
         }
@@ -348,6 +359,7 @@ namespace Sonar {
         private Gee.ArrayList<WebhookRequest> _requests;
         private Gee.ArrayList<WebhookRequest> _history;
         private Gee.ArrayList<RequestTemplate> _templates;
+        private RequestIndex _index;
         private int _max_requests;
         private int _max_history;
         private File _data_dir;
@@ -365,6 +377,7 @@ namespace Sonar {
             this._requests = new Gee.ArrayList<WebhookRequest>();
             this._history = new Gee.ArrayList<WebhookRequest>();
             this._templates = new Gee.ArrayList<RequestTemplate>();
+            this._index = new RequestIndex();
             this._max_requests = 1000;
             this._max_history = max_history;
 
@@ -397,23 +410,27 @@ namespace Sonar {
         
         public void add_request(WebhookRequest request) {
             this._requests.add(request);
-            
+
+            // Add to index for fast lookups
+            this._index.add_request(request);
+
             // Also add to history immediately
             this._history.insert(0, request);
-            
+
             // Remove oldest requests if we exceed the limit
             while (this._requests.size > this._max_requests) {
-                this._requests.remove_at(0);
+                var removed = this._requests.remove_at(0);
+                this._index.remove_request(removed);
             }
-            
+
             // Limit history size
             while (this._history.size > this._max_history) {
                 this._history.remove_at(this._history.size - 1);
             }
-            
+
             // Save history to disk
             this._save_history_to_disk();
-            
+
             request_added(request);
             history_changed();
         }
@@ -447,7 +464,8 @@ namespace Sonar {
         public void clear() {
             // Just clear active requests - don't move to history since they're already there
             this._requests.clear();
-            
+            this._index.clear();
+
             requests_cleared();
         }
         
@@ -661,6 +679,129 @@ namespace Sonar {
             } catch (Error e) {
                 warning("Failed to save templates to disk: %s", e.message);
             }
+        }
+
+        // Export functionality
+        /**
+         * Export current requests to the specified format.
+         *
+         * @param format Export format (HAR, CSV, CURL, JSON)
+         * @return Exported data as string
+         */
+        public string export_current_requests(ExportFormat format) throws GLib.Error {
+            return ExportUtils.export_requests(this._requests, format);
+        }
+
+        /**
+         * Export request history to the specified format.
+         *
+         * @param format Export format (HAR, CSV, CURL, JSON)
+         * @return Exported data as string
+         */
+        public string export_history(ExportFormat format) throws GLib.Error {
+            return ExportUtils.export_requests(this._history, format);
+        }
+
+        /**
+         * Export specific requests by ID to the specified format.
+         *
+         * @param request_ids List of request IDs to export
+         * @param format Export format (HAR, CSV, CURL, JSON)
+         * @return Exported data as string
+         */
+        public string export_selected_requests(Gee.ArrayList<string> request_ids, ExportFormat format) throws GLib.Error {
+            var selected = new Gee.ArrayList<WebhookRequest>();
+
+            foreach (var id in request_ids) {
+                foreach (var request in this._requests) {
+                    if (request.id == id) {
+                        selected.add(request);
+                        break;
+                    }
+                }
+                // Also check history if not found in current requests
+                if (selected.size < request_ids.size) {
+                    foreach (var request in this._history) {
+                        if (request.id == id && !selected.contains(request)) {
+                            selected.add(request);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return ExportUtils.export_requests(selected, format);
+        }
+
+        /**
+         * Export starred requests to the specified format.
+         *
+         * @param format Export format (HAR, CSV, CURL, JSON)
+         * @return Exported data as string
+         */
+        public string export_starred_requests(ExportFormat format) throws GLib.Error {
+            var starred = new Gee.ArrayList<WebhookRequest>();
+
+            foreach (var request in this._history) {
+                if (request.is_starred) {
+                    starred.add(request);
+                }
+            }
+
+            return ExportUtils.export_requests(starred, format);
+        }
+
+        /**
+         * Save export to file.
+         *
+         * @param data Exported data string
+         * @param file_path Path to save file
+         */
+        public void save_export_to_file(string data, string file_path) throws GLib.Error {
+            ExportUtils.save_to_file(data, file_path);
+        }
+
+        // Search and filtering methods
+        /**
+         * Search requests by keyword.
+         */
+        public Gee.ArrayList<WebhookRequest> search(string query) {
+            return this._index.search(query);
+        }
+
+        /**
+         * Find requests by HTTP method.
+         */
+        public Gee.ArrayList<WebhookRequest> find_by_method(string method) {
+            return this._index.find_by_method(method);
+        }
+
+        /**
+         * Find requests by path.
+         */
+        public Gee.ArrayList<WebhookRequest> find_by_path(string path) {
+            return this._index.find_by_path(path);
+        }
+
+        /**
+         * Find requests by content type.
+         */
+        public Gee.ArrayList<WebhookRequest> find_by_content_type(string content_type) {
+            return this._index.find_by_content_type(content_type);
+        }
+
+        /**
+         * Get all starred requests.
+         */
+        public Gee.ArrayList<WebhookRequest> get_starred_requests() {
+            return this._index.get_starred();
+        }
+
+        /**
+         * Get index statistics.
+         */
+        public HashTable<string, int> get_index_statistics() {
+            return this._index.get_statistics();
         }
     }
 }

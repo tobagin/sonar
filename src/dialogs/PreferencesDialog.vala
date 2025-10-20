@@ -134,14 +134,16 @@ namespace Sonar {
         private void _on_test_token_clicked() {
             this.test_token_button.set_sensitive(false);
             this.test_token_button.set_label("Testing...");
-            
-            // Refresh token status
-            var status = this.tunnel_manager.refresh_auth_token();
-            
-            Timeout.add(1000, () => {
+
+            // Refresh token status (now async)
+            this.tunnel_manager.refresh_auth_token();
+
+            // Wait a bit for the async refresh to complete, then check status
+            Timeout.add(2000, () => {
                 this.test_token_button.set_label("Test Connection");
                 this.test_token_button.set_sensitive(true);
-                
+
+                var status = this.tunnel_manager.get_status();
                 if (status.error == null || !status.error.contains("No NGROK_AUTHTOKEN")) {
                     this._show_success("Connection test successful");
                     this.token_status_label.set_text("Token is valid");
@@ -153,7 +155,7 @@ namespace Sonar {
                     this.token_status_label.remove_css_class("success");
                     this.token_status_label.add_css_class("error");
                 }
-                
+
                 return Source.REMOVE;
             });
         }
