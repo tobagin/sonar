@@ -34,39 +34,39 @@
   </description>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/main-window.png</image>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/main-window.png</image>
       <caption>Main window interface</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/main-window-start-tunnel.png</image>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/main-window-start-tunnel.png</image>
       <caption>Starting a tunnel to receive webhooks</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/main-window-tunnel-started.png</image>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/main-window-tunnel-started.png</image>
       <caption>Tunnel running and ready to receive requests</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/received-requests.png</image>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/received-requests.png</image>
       <caption>Viewing received webhook requests</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/history.png</image>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/history.png</image>
       <caption>Request history and details</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/request-statistics.png</image>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/request-statistics.png</image>
       <caption>Request statistics and analytics</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/preferences.png</image>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/preferences.png</image>
       <caption>Application preferences</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/keyboard-shortcuts.png</image>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/keyboard-shortcuts.png</image>
       <caption>Keyboard shortcuts</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/tobagin/sonar/main/screenshots/about.png</image>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/about.png</image>
       <caption>About dialog</caption>
     </screenshot>
   </screenshots>
@@ -87,6 +87,15 @@
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
 
   <releases>
+    <release version="2.2.1" date="2025-10-20">
+      <description>
+        <p>🐛 Bug Fix Release</p>
+        <p>Fixes:</p>
+        <ul>
+          <li>Fixed screenshot URLs in metainfo after directory reorganization</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.2.0" date="2025-10-20">
       <description>
         <p>🔒 Security &amp; Performance Enhancement Release</p>
