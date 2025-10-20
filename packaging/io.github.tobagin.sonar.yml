@@ -29,6 +29,7 @@ modules:
       - -Dmanpage=false
       - -Dvapi=true
       - -Dgtk_doc=false
+      - -Dbash_completion=disabled
     sources:
       - type: git
         url: https://gitlab.gnome.org/GNOME/libsecret.git
@@ -50,5 +51,5 @@ modules:
     sources:
       - type: git
         url: https://github.com/tobagin/Sonar.git
-        tag: v2.0.3
-        commit: 527733dce25653339e415b6599485a761a70a36a
+        tag: v2.2.0
+        commit: ba91bcd713a08236c11942554dfa76e9f2315373
