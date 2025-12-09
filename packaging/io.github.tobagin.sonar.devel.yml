@@ -44,7 +44,7 @@ modules:
     sources:
       - type: file
         url: https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
-        sha256: 21c6d25f78ee768d894ac4c8022f96a3f4a9573c52afcd8714452856353403b6
+        sha256: 12574f6361c8897af5c22a742e39243aaf083d1a213f48a0ddd763fd5adf7cfd
 
   - name: sonar
     buildsystem: meson
