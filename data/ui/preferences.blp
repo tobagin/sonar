@@ -9,6 +9,26 @@ template $SonarPreferencesDialog : Adw.PreferencesDialog {
     icon-name: "applications-system-symbolic";
 
     Adw.PreferencesGroup {
+      title: "Server Configuration";
+      description: "Configure local server settings";
+
+      Adw.ActionRow {
+        title: "Port";
+        subtitle: "Local port to listen on and forward (default: 8000)";
+
+        [suffix]
+        SpinButton port_spin {
+          valign: center;
+          adjustment: Adjustment {
+            lower: 1024;
+            upper: 65535;
+            step-increment: 1;
+          };
+        }
+      }
+    }
+
+    Adw.PreferencesGroup {
       title: "Ngrok Configuration";
       description: "Configure your ngrok authentication token to enable tunnel features";
 

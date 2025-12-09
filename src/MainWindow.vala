@@ -361,7 +361,9 @@ namespace Sonar {
                 this.tunnel_manager.stop();
                 this._update_tunnel_ui(this.tunnel_manager.get_status());
             } else {
-                this.tunnel_manager.start_async.begin(8000, "http", null, (obj, res) => {
+                var settings = new GLib.Settings(Config.APP_ID);
+                int port = settings.get_int("forwarded-port");
+                this.tunnel_manager.start_async.begin(port, "http", null, (obj, res) => {
                     this.tunnel_manager.start_async.end(res);
                     this._update_tunnel_ui(this.tunnel_manager.get_status());
                 });

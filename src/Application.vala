@@ -35,8 +35,10 @@ namespace Sonar {
 
             // Start the webhook server
             try {
-                this.server.start(8000, "127.0.0.1");
-                info("Webhook server started on http://127.0.0.1:8000");
+                var settings = new GLib.Settings(Config.APP_ID);
+                int port = settings.get_int("forwarded-port");
+                this.server.start(port, "127.0.0.1");
+                info(@"Webhook server started on http://127.0.0.1:$port");
             } catch (Error e) {
                 critical("Failed to start webhook server: %s", e.message);
             }
