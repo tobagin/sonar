@@ -32,16 +32,11 @@ namespace Sonar {
         [GtkChild] private unowned TextView forwarding_urls_textview;
         [GtkChild] private unowned Switch preserve_method_switch;
         [GtkChild] private unowned Switch forward_headers_switch;
-        [GtkChild] private unowned SpinButton port_spin;
 
         public PreferencesDialog(Gtk.Window parent, TunnelManager tunnel_manager, WebhookServer server) {
             Object();
             this.tunnel_manager = tunnel_manager;
             this.server = server;
-
-            // Bind settings
-            var settings = new GLib.Settings(Config.APP_ID);
-            settings.bind("forwarded-port", this.port_spin, "value", SettingsBindFlags.DEFAULT);
 
             this._setup_signals();
             this._load_current_settings();
