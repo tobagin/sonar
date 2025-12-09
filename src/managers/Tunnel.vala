@@ -310,9 +310,10 @@ namespace Sonar {
                 info("Starting ngrok tunnel on port %d...", port);
 
                 // Start ngrok process with proper flags
+                // Use 127.0.0.1 explicitly to match the server binding and avoid IPv6 issues
                 this.ngrok_process = new Subprocess(
                     SubprocessFlags.STDOUT_PIPE | SubprocessFlags.STDERR_PIPE,
-                    "ngrok", protocol, port.to_string(), "--log=stdout"
+                    "ngrok", protocol, @"127.0.0.1:$port", "--log=stdout"
                 );
 
                 this.status_lock.unlock();

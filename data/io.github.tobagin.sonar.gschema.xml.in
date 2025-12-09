@@ -21,10 +21,15 @@
       <summary>Window maximized</summary>
       <description>Whether the main window is maximized</description>
     </key>
-    <key name="last-version-shown" type="s">
+  <key name="last-version-shown" type="s">
       <default>""</default>
       <summary>Last version for which release notes were shown</summary>
       <description>Tracks the last application version for which release notes were displayed to avoid showing them repeatedly</description>
+    </key>
+    <key name="forwarded-port" type="i">
+      <default>8000</default>
+      <summary>Forwarded port</summary>
+      <description>The local port to listen on and forward</description>
     </key>
   </schema>
 </schemalist>
