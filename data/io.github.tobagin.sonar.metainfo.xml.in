@@ -87,6 +87,17 @@
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
 
   <releases>
+    <release version="2.2.2" date="2025-12-12">
+      <description>
+        <p>🐛 Bug Fixes and UX Improvements</p>
+        <p>Fixes:</p>
+        <ul>
+          <li>Fixed 500 Internal Server Error when accessing the root URL</li>
+          <li>Improved landing page layout with centered logo and better spacing</li>
+          <li>Refined webhook inspector terminology in documentation</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.2.1" date="2025-10-20">
       <description>
         <p>🐛 Bug Fix Release</p>
