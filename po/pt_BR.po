@@ -25,10 +25,10 @@ msgid "Webhook Inspector"
 msgstr "Inspetor de Webhook"
 
 msgid "Start Tunnel"
-msgstr "Túnel de Início"
+msgstr "Inicie Túnel"
 
 msgid "Stop Tunnel"
-msgstr "Túnel Stop"
+msgstr "Pare Túnel"
 
 msgid "No Requests Yet"
 msgstr "Ainda não há solicitações"
