@@ -1,7 +1,7 @@
 project(
     'sonar',
     'vala', 'c',
-    version: '2.2.2',
+    version: '2.3.0',
     meson_version: '>= 1.0.0',
     default_options: [
         'warning_level=1',
@@ -30,6 +30,7 @@ json_glib_dep = dependency('json-glib-1.0', version: '>= 1.6')
 libsoup_dep = dependency('libsoup-3.0', version: '>= 3.0')
 gee_dep = dependency('gee-0.8', version: '>= 0.20')
 libsecret_dep = dependency('libsecret-1', version: '>= 0.20', required: true)
+gtksource_dep = dependency('gtksourceview-5', version: '>= 5.0')
 
 # Build configuration
 cc = meson.get_compiler('c')
@@ -77,6 +78,7 @@ c_args = [
 subdir('data')
 subdir('src')
 subdir('po')
+subdir('tests')
 
 # Print summary
 summary({

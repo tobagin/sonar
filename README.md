@@ -1,80 +1,72 @@
 # Sonar
 
-**A modern desktop webhook inspector for developers**
+A modern desktop webhook inspector for developers.
 
-Sonar is a native GTK4 application that provides a beautiful, intuitive interface for capturing and inspecting webhook requests during development. Built with modern technologies and following GNOME design patterns, Sonar makes webhook debugging simple and efficient.
+![Sonar Application](data/screenshots/main-window-tunnel-started.png)
 
-![Sonar Screenshot](screenshot.png)
+## 🎉 Version 2.3.0 - Polishing & Fixes
 
-## ✨ Features
+**Sonar 2.3.0** continues to refined the experience with UI improvements and critical bug fixes.
 
-### Core Features
+### ✨ Key Features
+
 - **🔗 Instant Public URLs**: Generate public URLs via ngrok integration for webhook testing
 - **📡 Real-time Capture**: Live display of incoming webhook requests as they arrive
 - **🔍 Detailed Inspection**: View headers, body content, query parameters, and metadata
-- **📋 Quick Copy**: One-click copying of request data, headers, or body content
-- **🎯 Accordion UI**: Focus on one request at a time with automatic expansion behavior
-
-### Advanced Features
-- **⭐ Request Bookmarking**: Star important requests for quick access
-- **🔄 Request Replay**: Resend any webhook to custom URLs with full control
 - **⚖️ Request Comparison**: Side-by-side diff of two webhooks to spot differences
-- **📝 Request Templates**: Save requests as reusable templates for testing
-- **🔀 Webhook Forwarding**: Automatically forward webhooks to multiple URLs (with SSRF protection)
-- **🎯 Advanced Filtering**: Filter by method, content-type, path, and full-text search
-- **📤 Professional Export**: Export as HAR, CSV, cURL commands, or JSON format
-- **🔒 Rate Limiting**: Built-in DoS protection (100 req/s per endpoint, configurable)
+- **🔒 Secure Storage**: Encrypted credential storage via GNOME Keyring (libsecret)
+- **🎯 Mock Responses**: Configure custom responses for incoming webhooks (New!)
 
-### Developer Tools
-- **📊 Analytics Dashboard**: View detailed statistics about your webhook history
-- **🔎 Search & Filter**: Powerful search and filtering in request history
-- **💾 Persistent History**: All requests saved to disk with JSON storage
-- **⌨️ Keyboard Shortcuts**: Comprehensive keyboard shortcuts for productivity
+### 🆕 What's New in 2.2.x
 
-### Security & Performance (v2.2.0)
-- **🔒 Enterprise-Grade Security**:
-  - Encrypted credential storage via GNOME Keyring (libsecret)
-  - DoS protection with configurable rate limiting (100 req/s, burst 200)
-  - SSRF prevention with URL validation and private IP filtering
-  - Webhook signature validation (GitHub, Stripe, custom HMAC)
-  - Timing-safe signature comparison to prevent timing attacks
-  - Comprehensive input validation and sanitization
-  - Path traversal protection
-- **⚡ High Performance**:
-  - O(1) request indexing for instant lookups
-  - Batched UI updates (100ms intervals) for smooth 60fps rendering
-  - JSON parsing cache to avoid redundant parsing
-  - Async disk I/O to prevent UI freezing
-  - Native GTK4 application with minimal resource usage
-  - Improved memory management with LRU eviction
-- **🎨 Modern Design**: Clean Libadwaita interface that integrates perfectly with GNOME
+- **Mock Responses**: Intercept requests and return custom status codes and bodies.
+- **Import Functionality**: Load requests from JSON or HAR files.
+- **Editor Upgrade**: Full code editor with syntax highlighting for response bodies.
+- **Smart Auth Token**: Automatically strips commands when pasting ngrok tokens.
 
-## 🚀 Installation
+For detailed release notes and version history, see [CHANGELOG.md](CHANGELOG.md).
+
+## Features
+
+### Core Features
+- **Native Experience**: Built with Vala, GTK4, and Libadwaita for a native GNOME feel.
+- **Request Inspection**: Detailed breakdown of HTTP headers, payload, and query params.
+- **Search & Filter**: Powerful filtering by method, content-type, and full-text search.
+
+### User Experience
+- **Request Replay**: Resend any captured webhook to custom URLs.
+- **Templates**: Save requests as reusable templates for testing.
+- **Keyboard Shortcuts**: Comprehensive shortcuts for productivity (`Ctrl+?`).
+- **Dark Mode**: Fully supports system-wide dark theme preference.
+
+### Security
+- **Encrypted Storage**: Credentials never stored in plain text.
+- **DoS Protection**: Built-in rate limiting traversal protection.
+- **Safe Forwarding**: SSRF prevention and signature validation.
+
+## Installation
 
 ### Flatpak (Recommended)
 
+#### From Flathub (Coming Soon)
 ```bash
-# Install from Flathub (coming soon)
 flatpak install flathub io.github.tobagin.sonar
+```
 
-# Or build locally
+#### Development Version
+```bash
+# Clone the repository
 git clone https://github.com/tobagin/sonar.git
 cd sonar
-./build.sh --dev --install
+
+# Build and install development version
+./scripts/build.sh --dev --install
+flatpak run io.github.tobagin.sonar.Devel
 ```
 
 ### From Source
 
-**Requirements:**
-- Vala compiler (valac)
-- GTK4 4.8+ development libraries
-- Libadwaita 1.4+ development libraries
-- libsoup 3.0+ development libraries
-- json-glib 1.6+ development libraries
-- libgee 0.8+ development libraries
-- libsecret 0.20+ development libraries (for encrypted credentials)
-- Meson build system (>= 1.0.0)
-- Blueprint compiler
+**Requirements:** Vala, GTK4, Libadwaita, libsoup 3.0, json-glib, libgee, libsecret, Meson.
 
 ```bash
 git clone https://github.com/tobagin/sonar.git
@@ -84,121 +76,70 @@ meson compile -C builddir
 meson install -C builddir
 ```
 
-## 🔧 Setup
+## Usage
 
-### 1. Install ngrok (Required)
+### Basic Usage
 
-Sonar uses ngrok to create public URLs for webhook testing:
-
+Launch Sonar from your applications menu or run:
 ```bash
-# Download from https://ngrok.com/download
-# Or use package manager:
-snap install ngrok          # Ubuntu/Debian
-brew install ngrok/ngrok/ngrok  # macOS
+flatpak run io.github.tobagin.sonar.Devel
 ```
 
-### 2. Configure ngrok Auth Token
+1.  **Start Tunnel**: Click "Start Tunnel" to create a public URL.
+2.  **Configure**: Use the URL in your webhook provider.
+3.  **Inspect**: Watch requests arrive in real-time.
 
-1. Sign up at [ngrok.com](https://ngrok.com) (free account available)
-2. Get your auth token from the dashboard
-3. Launch Sonar and click "Setup Ngrok Token" to configure
+### Mocking Responses
 
-**Note**: Your ngrok token is stored **encrypted** in your system keyring for security. Sonar never stores credentials in plain text.
-
-## 📖 Usage
-
-### Basic Workflow
-
-1. **Start Sonar** - Launch the application from your app menu or terminal
-2. **Start Tunnel** - Click "Start Tunnel" to create a public URL
-3. **Configure Webhook** - Copy the public URL and configure it in your webhook provider
-4. **Inspect Requests** - View incoming webhooks in real-time with full details
+1.  Open the menu and select **Mock Response** (or press `Ctrl+M`).
+2.  Enable mocking and configure the desired status code and body.
+3.  Incoming requests will now receive your simulated response.
 
 ### Keyboard Shortcuts
 
-**General:**
-- `Ctrl+Q` - Quit application
-- `Ctrl+,` - Open preferences
-- `Ctrl+?` - Show keyboard shortcuts
-- `F1` - Show about dialog
-- `F11` - Toggle fullscreen
+- `Ctrl+T` - Start/Stop Tunnel
+- `Ctrl+U` - Copy Public URL
+- `Ctrl+L` - Clear Requests
+- `Ctrl+H` - Toggle History
+- `Ctrl+M` - Mock Response Dialog
+- `Ctrl+,` - Preferences
+- `F1` - About
 
-**Tunnel Management:**
-- `Ctrl+T` - Start/Stop tunnel
-- `Ctrl+U` - Copy public URL
-- `F5` - Refresh status
+## Architecture
 
-**Request Management:**
-- `Ctrl+L` - Clear all requests
-- `Ctrl+H` - View history
+Sonar is built using modern GNOME technologies:
 
-Press `Ctrl+?` to view all available shortcuts in the app!
+- **Vala**: For high performance and type safety.
+- **GTK4 / Libadwaita**: For the user interface.
+- **libsoup 3**: For robust HTTP server/client capabilities.
+- **JSON-GLib**: For efficient JSON parsing and generation.
 
-### Request Details
+## Privacy & Security
 
-Each webhook request shows:
-- **Method & Path** - HTTP method and endpoint path
-- **Timestamp** - When the request was received
-- **Headers** - All HTTP headers with copy functionality
-- **Body** - Request body with JSON formatting when applicable
-- **Content Type** - MIME type of the request
-- **Query Parameters** - URL query string parameters
+Sonar is designed to respect your privacy and security:
 
-### Copy Functionality
+- **Local First**: All request data is stored locally on your machine.
+- **Encrypted Secrets**: Auth tokens are stored in the system keyring.
+- **Sandboxed**: Distributed as a Flatpak with strict permissions.
 
-- **Copy All** - Complete request data as JSON
-- **Copy Headers** - Just the headers in HTTP format
-- **Copy Body** - Just the request body content
-- **Copy as cURL** - Generate cURL command for replaying
-- **Copy as HTTP** - Generate raw HTTP request format
-- **Copy URL** - The public ngrok URL
+## Contributing
 
-### Advanced Features
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-#### Request Filtering
-Filter webhooks by multiple criteria:
-- **HTTP Method** - GET, POST, PUT, DELETE, PATCH, etc.
-- **Content Type** - JSON, XML, form data, etc.
-- **Time Range** - Last 5 min, 15 min, 30 min, hour, or 24 hours
-- **Search Text** - Search in path and body content
-- **Starred Only** - Show only bookmarked requests
+- Reporting Bugs: [GitHub Issues](https://github.com/tobagin/sonar/issues)
+- Discussions: [GitHub Discussions](https://github.com/tobagin/sonar/discussions)
 
-#### Request Replay
-Resend any captured webhook to test your endpoints:
-1. Click "Replay Request" on any webhook
-2. Enter the target URL (pre-filled with original path)
-3. Request is sent with original method, headers, and body
-4. Get instant feedback on success/failure
+## License
 
-#### Request Comparison
-Compare two webhooks side-by-side:
-1. Click "Select for Comparison" on first request
-2. Click "Compare with Selected" on second request
-3. View differences highlighted in:
-   - HTTP method
-   - Request path
-   - Content type
-   - Headers (side-by-side)
-   - Body content (side-by-side)
+Sonar is licensed under the [GNU General Public License v3.0](LICENSE).
 
-#### Request Templates
-Save webhooks as reusable templates:
-1. Click "Save as Template" on any request
-2. Give it a name and description
-3. Templates are stored persistently
-4. Use templates for quick testing scenarios
+## Acknowledgments
 
-#### Webhook Forwarding
-Automatically forward all incoming webhooks:
-1. Open Preferences → Forwarding tab
-2. Enable forwarding and add target URLs
-3. Choose options:
-   - Preserve original HTTP method or force POST
-   - Include original headers or send clean
-4. All webhooks are forwarded asynchronously
-5. Perfect for local development or staging environments
+- **ngrok**: For providing the tunneling service.
+- **GNOME**: For the excellent GTK4 and Libadwaita frameworks.
+- **Vala**: For the powerful programming language.
 
-## 📸 Screenshots
+## Screenshots
 
 | Main Window | Tunnel Started | Received Requests |
 |-------------|----------------|-------------------|
@@ -208,106 +149,6 @@ Automatically forward all incoming webhooks:
 |-------------|----------------|-------------|
 | ![History](data/screenshots/history.png) | ![Setup](data/screenshots/main-window-setup-required.png) | ![About](data/screenshots/about.png) |
 
-## 🛠️ Development
-
-### Requirements
-
-- Vala compiler (valac)
-- GTK4 4.8+
-- Libadwaita 1.4+
-- libsoup 3.0+
-- json-glib 1.6+
-- libgee 0.8+
-- Meson build system
-
-### Development Setup
-
-```bash
-# Clone and setup
-git clone https://github.com/tobagin/sonar.git
-cd sonar
-
-# Build for development
-./scripts/build.sh --dev
-
-# Install development build
-./scripts/build.sh --dev --install
-
-# Run the development version
-flatpak run io.github.tobagin.sonar.Devel
-```
-
-### Project Structure
-
-```
-sonar/
-├── src/                    # Vala source code
-│   ├── application.vala   # Application entry point
-│   ├── main_window.vala   # Main window implementation
-│   ├── models.vala        # Data models
-│   ├── server.vala        # Webhook server (libsoup)
-│   ├── tunnel.vala        # Ngrok tunnel management
-│   ├── preferences_dialog.vala    # Settings dialog
-│   ├── request_row.vala   # Request list item widget
-│   ├── statistics_dialog.vala    # Statistics dashboard
-│   └── shortcuts_dialog.vala     # Keyboard shortcuts
-├── data/                   # Application data
-│   ├── ui/                # Blueprint UI definitions
-│   ├── icons/             # Application icons
-│   └── io.github.tobagin.sonar.metainfo.xml.in
-├── packaging/              # Flatpak manifests
-├── po/                     # Internationalization
-└── scripts/                # Build scripts
-```
-
-### Building UI
-
-Sonar uses Blueprint for UI definition:
-
-```bash
-# Compile Blueprint files
-blueprint-compiler batch-compile data/ui/ data/ui/ data/ui/*.blp
-
-# Or use the build script
-./build.sh --dev
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Reporting Issues
-
-- **Bugs**: Use the [bug report template](.github/ISSUE_TEMPLATE/bug_report.md)
-- **Features**: Use the [feature request template](.github/ISSUE_TEMPLATE/feature_request.md)
-- **Questions**: Start a [discussion](https://github.com/tobagin/sonar/discussions)
-
-### Development Guidelines
-
-- Follow PEP 8 for Python code
-- Use type hints for all functions
-- Write tests for new functionality
-- Update documentation for user-facing changes
-- Test your changes on different distributions
-
-## 📄 License
-
-Sonar is licensed under the [GNU General Public License v3.0](LICENSE).
-
-## 🙏 Acknowledgments
-
-- [ngrok](https://ngrok.com) for providing the tunneling service
-- [GNOME](https://gnome.org) for the excellent GTK4 and Libadwaita frameworks
-- [Blueprint](https://gitlab.gnome.org/jwestman/blueprint-compiler) for the modern UI definition language
-- The Python community for the excellent libraries used in this project
-
-## 📞 Support
-
-- **Documentation**: [Wiki](https://github.com/tobagin/sonar/wiki)
-- **Issues**: [GitHub Issues](https://github.com/tobagin/sonar/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/tobagin/sonar/discussions)
-- **Email**: tobagin@example.com
-
 ---
 
-**Made with ❤️ for the developer community**
+**Sonar** - A modern desktop webhook inspector for developers.

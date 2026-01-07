@@ -147,6 +147,14 @@ namespace Sonar {
             });
             this.add_action(refresh_action);
             this.set_accels_for_action("app.refresh", {"F5"});
+
+            // Mock response action
+            var mock_response_action = new SimpleAction("mock-response", null);
+            mock_response_action.activate.connect(() => {
+                this._on_mock_response_action();
+            });
+            this.add_action(mock_response_action);
+            this.set_accels_for_action("app.mock-response", {"<primary>m"});
             
             // Toggle fullscreen action
             var fullscreen_action = new SimpleAction("toggle-fullscreen", null);
@@ -287,7 +295,7 @@ namespace Sonar {
             
             string[] developers = { "Thiago Fernandes" };
             string[] designers = { "Thiago Fernandes" };
-            string[] artists = { "Thiago Fernandes" };
+            string[] artists = { "Thiago Fernandes", "@oiimrosabel" };
             
             string app_name = "Sonar";
             string comments = "A modern, native GTK4/LibAdwaita webhook inspector for capturing and debugging HTTP requests with comprehensive logging and tunnel management capabilities";
@@ -394,6 +402,13 @@ namespace Sonar {
             if (this.window != null) {
                 var preferences = new PreferencesDialog(this.window, this.tunnel_manager, this.server);
                 preferences.present(this.window);
+            }
+        }
+
+        private void _on_mock_response_action() {
+            if (this.window != null) {
+                var dialog = new MockResponseDialog(this.window, this.server.mock_manager);
+                dialog.present();
             }
         }
     }

@@ -6,5 +6,6 @@
     <file>preferences.ui</file>
     <file>shortcuts_dialog.ui</file>
     <file>statistics_dialog.ui</file>
+    <file>mock_response_dialog.ui</file>
   </gresource>
 </gresources>

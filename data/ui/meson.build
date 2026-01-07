@@ -74,6 +74,20 @@ statistics_dialog_ui = custom_target(
 )
 blueprints += statistics_dialog_ui
 
+# Compile mock_response_dialog.blp
+mock_response_dialog_ui = custom_target(
+  'mock_response_dialog.ui',
+  input: files('mock_response_dialog.blp'),
+  output: 'mock_response_dialog.ui',
+  command: [
+    blueprint_compiler,
+    'compile',
+    '--output', '@OUTPUT@',
+    '@INPUT@'
+  ]
+)
+blueprints += mock_response_dialog_ui
+
 # Get configuration data from parent
 conf_data = get_variable('conf_data')
 

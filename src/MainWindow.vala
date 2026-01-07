@@ -50,6 +50,7 @@ namespace Sonar {
         [GtkChild] private unowned Button clear_history_button;
         [GtkChild] private unowned Button history_stats_button;
         [GtkChild] private unowned Button export_history_button;
+        [GtkChild] private unowned Button import_history_button;
         [GtkChild] private unowned Button back_to_requests_button;
         [GtkChild] private unowned ListBox history_list;
 
@@ -143,8 +144,9 @@ namespace Sonar {
             this.requests_time_filter.notify["selected"].connect(this._apply_filters);
             this.starred_only_toggle.toggled.connect(this._apply_filters);
             this.export_history_button.clicked.connect(() => {
-                this._show_toast("History export temporarily disabled");
+                this.export_requests();
             });
+            this.import_history_button.clicked.connect(this.import_history);
             this.back_to_requests_button.clicked.connect(this._on_back_to_requests_clicked);
 
             // Storage signals
@@ -460,6 +462,74 @@ namespace Sonar {
                     this._show_toast("Export failed: " + e.message);
                 }
             });
+        }
+
+        public void import_history() {
+            var file_dialog = new Gtk.FileDialog();
+            file_dialog.set_title("Import History");
+            
+            var filters = new GLib.ListStore(typeof(Gtk.FileFilter));
+            
+            var json_filter = new Gtk.FileFilter();
+            json_filter.name = "Sonar JSON";
+            json_filter.add_pattern("*.json");
+            filters.append(json_filter);
+            
+            var har_filter = new Gtk.FileFilter();
+            har_filter.name = "HTTP Archive (HAR)";
+            har_filter.add_pattern("*.har");
+            filters.append(har_filter);
+            
+            var all_filter = new Gtk.FileFilter();
+            all_filter.name = "All Files";
+            all_filter.add_pattern("*");
+            filters.append(all_filter);
+            
+            file_dialog.set_filters(filters);
+
+            file_dialog.open.begin(this, null, (obj, res) => {
+                try {
+                    var file = file_dialog.open.end(res);
+                    if (file != null) {
+                        this._import_file(file);
+                    }
+                } catch (Error e) {
+                    // Ignore cancellation
+                    if (!(e is Gtk.DialogError.CANCELLED)) {
+                        this._show_toast("Import failed: " + e.message);
+                    }
+                }
+            });
+        }
+
+        private void _import_file(File file) {
+            try {
+                // Determine format based on extension or try both
+                string basename = file.get_basename().down();
+                Gee.ArrayList<WebhookRequest> requests;
+
+                if (basename.has_suffix(".har")) {
+                    requests = ImportUtils.import_from_har(file);
+                } else {
+                    // Default to JSON
+                    requests = ImportUtils.import_from_json(file);
+                }
+
+                if (requests.size > 0) {
+                    int count = 0;
+                    foreach (var request in requests) {
+                        this.storage.add_request(request);
+                        count++;
+                    }
+                    this._show_toast(@"Imported $count requests successfully");
+                    this._load_history(); // Refresh view
+                } else {
+                    this._show_toast("No valid requests found in file");
+                }
+            } catch (Error e) {
+                this._show_toast("Error importing file: " + e.message);
+                warning("Import error: %s", e.message);
+            }
         }
 
         private void _show_toast(string message, int timeout = 3) {

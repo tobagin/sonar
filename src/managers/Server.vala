@@ -23,7 +23,10 @@ namespace Sonar {
         private bool forwarding_enabled = false;
         private Gee.ArrayList<string> forward_urls;
         private bool preserve_method = true;
+
         private bool forward_headers = true;
+
+        public MockManager mock_manager { get; private set; }
 
         public signal void request_received(WebhookRequest request);
 
@@ -34,14 +37,16 @@ namespace Sonar {
             this.host = "127.0.0.1";
             this.is_running = false;
             this.server_source_id = 0;
+
             this.forward_urls = new Gee.ArrayList<string>();
+            this.mock_manager = new MockManager();
 
             this.server = new Soup.Server("server-header", @"Sonar-Vala/$(Config.VERSION)");
             this._setup_routes();
         }
         
         private void _setup_routes() {
-            critical(">>>> SETUP ROUTES CALLED <<<<");
+
             
             // Health check endpoint
             this.server.add_handler("/health", (server, msg, path, query) => {
@@ -168,6 +173,8 @@ namespace Sonar {
                     return;
                 }
 
+
+
                 var method = msg.get_method();
                 var headers = new HashTable<string, string>(str_hash, str_equal);
                 var query_params = new HashTable<string, string>(str_hash, str_equal);
@@ -195,6 +202,33 @@ namespace Sonar {
                 var request_headers = msg.get_request_headers();
                 string? content_type = request_headers.get_content_type(null);
                 int64 content_length = request_headers.get_content_length();
+
+                // Check for mock response
+                if (this.mock_manager.enabled) {
+                    msg.set_status(this.mock_manager.status_code, null);
+                    msg.set_response(this.mock_manager.content_type, Soup.MemoryUse.COPY, this.mock_manager.body.data);
+                    
+                    // Log mock request
+                    var mock_request = new WebhookRequest.full(
+                        method,
+                        path,
+                        headers,
+                        body,
+                        query_params,
+                        content_type,
+                        content_length
+                    );
+                    
+                    // Store request even if mocked, so user sees it came in
+                    this.storage.add_request(mock_request);
+                    this.request_received(mock_request);
+                    
+                    info("Returned mock response (%d) to %s from %s", 
+                         this.mock_manager.status_code, 
+                         method, 
+                         path);
+                    return;
+                }
                 
                 
                 // Validate and sanitize input data

@@ -151,14 +151,30 @@ namespace Sonar {
                 var obj = node.get_object();
                 var request = new WebhookRequest();
                 
-                request.id = obj.get_string_member("id");
+                if (obj.has_member("id")) {
+                    request.id = obj.get_string_member("id");
+                }
                 
-                var timestamp_str = obj.get_string_member("timestamp");
-                request.timestamp = new DateTime.from_iso8601(timestamp_str, null);
+                if (obj.has_member("timestamp")) {
+                    var timestamp_str = obj.get_string_member("timestamp");
+                    request.timestamp = new DateTime.from_iso8601(timestamp_str, null);
+                }
                 
-                request.method = obj.get_string_member("method");
-                request.path = obj.get_string_member("path");
-                request.body = obj.get_string_member("body");
+                if (obj.has_member("method")) {
+                    request.method = obj.get_string_member("method");
+                } else {
+                    request.method = "UNKNOWN";
+                }
+
+                if (obj.has_member("path")) {
+                    request.path = obj.get_string_member("path");
+                }
+                
+                if (obj.has_member("body")) {
+                    request.body = obj.get_string_member("body");
+                } else {
+                    request.body = "";
+                }
                 
                 if (obj.has_member("content_type") && !obj.get_null_member("content_type")) {
                     request.content_type = obj.get_string_member("content_type");

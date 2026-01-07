@@ -107,6 +107,13 @@ namespace Sonar {
         
         private void _on_save_token_clicked() {
             string token = this.auth_token_entry.get_text().strip();
+
+            // Smart cleanup for "ngrok config add-authtoken <token>" paste
+            if (token.has_prefix("ngrok config add-authtoken ")) {
+                token = token.replace("ngrok config add-authtoken ", "").strip();
+                // Update UI to show what we are actually saving
+                this.auth_token_entry.set_text(token);
+            }
             
             if (token.length == 0) {
                 this._show_error("Please enter a valid auth token");

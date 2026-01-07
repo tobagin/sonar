@@ -1,0 +1,124 @@
+using Gtk 4.0;
+using Adw 1;
+using GtkSource 5;
+
+template $SonarMockResponseDialog: Adw.Window {
+    modal: true;
+    width-request: 500;
+    height-request: 450;
+    title: _("Mock Response Settings");
+
+    content: Gtk.Box {
+        orientation: vertical;
+        spacing: 0;
+
+        Adw.HeaderBar {
+            show-end-title-buttons: false;
+
+            [start]
+            Gtk.Button cancel_button {
+                label: _("Cancel");
+            }
+
+            [end]
+            Gtk.Button save_button {
+                label: _("Save");
+
+                styles [
+                    "suggested-action",
+                ]
+            }
+        }
+
+        Adw.PreferencesPage {
+            Adw.PreferencesGroup {
+                title: _("General");
+
+                Adw.ActionRow {
+                    title: _("Enable Mock Response");
+                    subtitle: _("Intercept incoming requests and return a custom response");
+                    activatable-widget: enable_mock_switch;
+
+                    [suffix]
+                    Gtk.Switch enable_mock_switch {
+                        valign: center;
+                    }
+                }
+            }
+
+            Adw.PreferencesGroup {
+                title: _("Response Configuration");
+
+                Adw.ActionRow {
+                    title: _("Status Code");
+                    subtitle: _("HTTP status code to return");
+
+                    [suffix]
+                    Gtk.SpinButton status_code_spin {
+                        valign: center;
+
+                        adjustment: Gtk.Adjustment {
+                            lower: 100;
+                            upper: 599;
+                            step-increment: 1;
+                            value: 200;
+                        };
+                    }
+                }
+
+                Adw.ActionRow {
+                    title: _("Content Type");
+                    subtitle: _("Content-Type header value");
+
+                    [suffix]
+                    Gtk.DropDown content_type_dropdown {
+                        valign: center;
+
+                        model: Gtk.StringList {
+                            strings [
+                                "application/json",
+                                "text/plain",
+                                "text/html",
+                                "application/xml",
+                                "application/x-www-form-urlencoded",
+                            ]
+                        };
+                    }
+                }
+            }
+
+            Adw.PreferencesGroup {
+                title: _("Response Body");
+
+                Gtk.Box {
+                    orientation: vertical;
+                    height-request: 200;
+                    margin-bottom: 12;
+                    margin-start: 12;
+                    margin-end: 12;
+
+                    Gtk.ScrolledWindow {
+                        vexpand: true;
+                        hexpand: true;
+
+                        styles [
+                            "card",
+                        ]
+
+                        GtkSource.View body_view {
+                            monospace: true;
+                            top-margin: 12;
+                            bottom-margin: 12;
+                            left-margin: 12;
+                            right-margin: 12;
+                            show-line-numbers: false;
+                            highlight-current-line: true;
+                            tab-width: 4;
+                            auto-indent: true;
+                        }
+                    }
+                }
+            }
+        }
+    };
+}

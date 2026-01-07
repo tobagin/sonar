@@ -87,6 +87,27 @@
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
 
   <releases>
+    <release version="2.3.0" date="2026-01-07">
+      <description>
+        <p>✨ New Features &amp; Polish</p>
+        <p>Mock Responses:</p>
+        <ul>
+          <li>Intercept incoming webhooks and return custom responses</li>
+          <li>Configure status code, headers, and body content</li>
+          <li>Full code editor with syntax highlighting and "Solarized Light" theme</li>
+        </ul>
+        <p>Import:</p>
+        <ul>
+          <li>Import requests from JSON and HAR files</li>
+        </ul>
+        <p>Improvements:</p>
+        <ul>
+          <li>✨ Fresh new application icons (Thanks to @oiimrosabel)</li>
+          <li>Smart authentication token handling for ngrok</li>
+          <li>Refined UI with extensive use of rounded cards and better padding</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.2.2" date="2025-12-12">
       <description>
         <p>🐛 Bug Fixes and UX Improvements</p>

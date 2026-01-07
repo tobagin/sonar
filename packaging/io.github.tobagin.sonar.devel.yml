@@ -39,17 +39,25 @@ modules:
   - name: ngrok
     buildsystem: simple
     build-commands:
-      - tar -xzf ngrok-v3-stable-linux-amd64.tgz
+      - tar -xzf ngrok.tgz
       - install -Dm755 ngrok ${FLATPAK_DEST}/bin/ngrok
     sources:
       - type: file
         url: https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
-        sha256: 12574f6361c8897af5c22a742e39243aaf083d1a213f48a0ddd763fd5adf7cfd
+        sha256: 8cbaf02b3f9b3c118acf5bd3075b2668151031c158cb458b79a68c3b14ed34e8
+        dest-filename: ngrok.tgz
+        only-arches: [x86_64]
+      - type: file
+        url: https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm64.tgz
+        sha256: 10509202894c6e005bc62a3fb4fcee19addeac57cd490a33d3af7c847b5dd0d8
+        dest-filename: ngrok.tgz
+        only-arches: [aarch64]
 
   - name: sonar
     buildsystem: meson
     config-opts:
       - -Dprofile=development
+    run-tests: true
     sources:
       - type: dir
         path: ..
