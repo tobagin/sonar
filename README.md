@@ -4,9 +4,9 @@ A modern desktop webhook inspector for developers.
 
 ![Sonar Application](data/screenshots/main-window-tunnel-started.png)
 
-## 🎉 Version 2.3.0 - Polishing & Fixes
+## 🎉 Version 2.3.1 - UI Polishing & Bug Fixes
 
-**Sonar 2.3.0** continues to refined the experience with UI improvements and critical bug fixes.
+**Sonar 2.3.1** adds critical fixes for webhook capturing and improves the UI layout.
 
 ### ✨ Key Features
 
@@ -145,9 +145,9 @@ Sonar is licensed under the [GNU General Public License v3.0](LICENSE).
 |-------------|----------------|-------------------|
 | ![Main Window](data/screenshots/main-window-start-tunnel.png) | ![Tunnel Started](data/screenshots/main-window-tunnel-started.png) | ![Received Requests](data/screenshots/received-requests.png) |
 
-| History View | Setup Required | About Dialog |
+| History View | Clear Data | About Dialog |
 |-------------|----------------|-------------|
-| ![History](data/screenshots/history.png) | ![Setup](data/screenshots/main-window-setup-required.png) | ![About](data/screenshots/about.png) |
+| ![History](data/screenshots/history.png) | ![Clear Data](data/screenshots/clear-data.png) | ![About](data/screenshots/about.png) |
 
 ---
 

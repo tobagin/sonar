@@ -57,8 +57,8 @@ namespace Sonar {
             
             // Master handler for root and webhooks
             this.server.add_handler(null, (server, msg, path, query) => {
-                // Exact match for root landing page
-                if (path == "/") {
+                // Match root landing page only for GET requests (for browser visits)
+                if (path == "/" && msg.get_method() == "GET") {
                     this._serve_landing_page(msg);
                     return;
                 }
@@ -156,8 +156,8 @@ namespace Sonar {
         
         private void _handle_webhook_request(Soup.ServerMessage msg, string path, HashTable<string, string>? query) {
             try {
-                // Skip root path (handled by specific handler)
-                if (path == "/" || path == "/health") {
+                // Skip health check path
+                if (path == "/health") {
                     return;
                 }
 

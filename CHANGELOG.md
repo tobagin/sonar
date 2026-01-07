@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.1] - 2026-01-07
+
+### Fixed
+- **Root Path Capture**: Fixed an issue where webhooks sent to the root path (`/`) were ignored by the server.
+
+### Changed
+- **UI Layout**: Moved request body content to be immediately visible under the "Body" section header for better accessibility.
+- **UI Contrast**: Updated "Copy as cURL" and "Save as Template" buttons to use high-contrast styles.
+
+### Added
+- **Translations**: Added Brazilian Portuguese (pt_BR) translation (Thanks to @johnpetersa19) - PR #3
+- **Documentation**: Updated application screenshots in README and AppStream metadata.
+
 ## [2.3.0] - 2026-01-07
 
 ### Added

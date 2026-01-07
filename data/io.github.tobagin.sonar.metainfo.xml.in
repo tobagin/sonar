@@ -34,16 +34,12 @@
   </description>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/main-window.png</image>
-      <caption>Main window interface</caption>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/main-window-tunnel-started.png</image>
+      <caption>Tunnel running and ready to receive requests</caption>
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/main-window-start-tunnel.png</image>
       <caption>Starting a tunnel to receive webhooks</caption>
-    </screenshot>
-    <screenshot>
-      <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/main-window-tunnel-started.png</image>
-      <caption>Tunnel running and ready to receive requests</caption>
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/received-requests.png</image>
@@ -64,6 +60,10 @@
     <screenshot>
       <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/keyboard-shortcuts.png</image>
       <caption>Keyboard shortcuts</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/clear-data.png</image>
+      <caption>Clear Data dialog</caption>
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/tobagin/sonar/main/data/screenshots/about.png</image>
@@ -87,6 +87,22 @@
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
 
   <releases>
+    <release version="2.3.1" date="2026-01-07">
+      <description>
+        <p>🐛 Bug Fixes &amp; UI Improvements</p>
+        <p>Fixes:</p>
+        <ul>
+          <li>Fixed webhooks sent to the root path (/) not being captured</li>
+        </ul>
+        <p>Improvements:</p>
+        <ul>
+          <li>Ideally positioned body content in request details</li>
+          <li>Improved contrast for action buttons</li>
+          <li>Added Brazilian Portuguese (pt_BR) translation</li>
+          <li>Updated application screenshots</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.3.0" date="2026-01-07">
       <description>
         <p>✨ New Features &amp; Polish</p>
