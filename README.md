@@ -48,10 +48,7 @@ For detailed release notes and version history, see [CHANGELOG.md](CHANGELOG.md)
 
 ### Flatpak (Recommended)
 
-#### From Flathub (Coming Soon)
-```bash
-flatpak install flathub io.github.tobagin.sonar
-```
+[![Get it on Flathub](https://flathub.org/api/badge)](https://flathub.org/en/apps/io.github.tobagin.sonar)
 
 #### Development Version
 ```bash
