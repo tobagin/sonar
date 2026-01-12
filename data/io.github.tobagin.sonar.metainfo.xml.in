@@ -4,13 +4,15 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
   <name>@APP_NAME@</name>
-  <summary>Desktop webhook inspector for developers</summary>
+  <summary>Inspect and debug webhooks</summary>
+  <branding>
+    <color type="primary" scheme_preference="light">#1F7BDC</color>
+    <color type="primary" scheme_preference="dark">#1F7BDC</color>
+  </branding>
   <description>
     <p>
-      Sonar is a native GTK4 application that provides a beautiful, intuitive interface 
-      for capturing and inspecting webhook requests during development. Built with modern 
-      technologies and following GNOME design patterns, Sonar makes webhook debugging 
-      simple and efficient.
+      Sonar is a native tool for debugging webhooks. It captures incoming requests and
+      lets you inspect headers, body content, and query parameters in real-time.
     </p>
     <p>Core Features:</p>
     <ul>
@@ -87,6 +89,17 @@
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
 
   <releases>
+    <release version="2.3.2" date="2026-01-12">
+      <description>
+        <p>📝 Documentation &amp; Metadata Updates</p>
+        <p>Improvements:</p>
+        <ul>
+          <li>Added branding colors to AppStream metadata</li>
+          <li>Simplified application summary and description</li>
+          <li>Updated README with Flathub/Ko-fi badges and simplified instructions</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.3.1" date="2026-01-07">
       <description>
         <p>🐛 Bug Fixes &amp; UI Improvements</p>

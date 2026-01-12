@@ -2,27 +2,33 @@
 
 A modern desktop webhook inspector for developers.
 
+<div align="center">
+
 ![Sonar Application](data/screenshots/main-window-tunnel-started.png)
 
-## 🎉 Version 2.3.1 - UI Polishing & Bug Fixes
+<a href="https://flathub.org/en/apps/io.github.tobagin.sonar"><img src="https://flathub.org/api/badge" height="110" alt="Get it on Flathub"></a>
+<a href="https://ko-fi.com/tobagin"><img src="data/kofi_button.png" height="82" alt="Support me on Ko-Fi"></a>
 
-**Sonar 2.3.1** adds critical fixes for webhook capturing and improves the UI layout.
+</div>
+
+## 🎉 Version 2.3.2 - Metadata & Docs
+
+**Sonar 2.3.2** brings improvements to packaging metadata and documentation.
 
 ### ✨ Key Features
 
 - **🔗 Instant Public URLs**: Generate public URLs via ngrok integration for webhook testing
 - **📡 Real-time Capture**: Live display of incoming webhook requests as they arrive
-- **🔍 Detailed Inspection**: View headers, body content, query parameters, and metadata
 - **⚖️ Request Comparison**: Side-by-side diff of two webhooks to spot differences
 - **🔒 Secure Storage**: Encrypted credential storage via GNOME Keyring (libsecret)
 - **🎯 Mock Responses**: Configure custom responses for incoming webhooks (New!)
 
-### 🆕 What's New in 2.2.x
+### 🆕 What's New in 2.3.x
 
-- **Mock Responses**: Intercept requests and return custom status codes and bodies.
-- **Import Functionality**: Load requests from JSON or HAR files.
-- **Editor Upgrade**: Full code editor with syntax highlighting for response bodies.
-- **Smart Auth Token**: Automatically strips commands when pasting ngrok tokens.
+- **Metadata**: Branding colors and simplified summary for Flathub.
+- **Docs**: "Get it from Flathub" badge and simplified build instructions.
+- **Mock Responses**: Intercept incoming webhooks (2.3.0).
+- **UI improvements**: High contrast buttons and better layout (2.3.1).
 
 For detailed release notes and version history, see [CHANGELOG.md](CHANGELOG.md).
 
@@ -44,11 +50,9 @@ For detailed release notes and version history, see [CHANGELOG.md](CHANGELOG.md)
 - **DoS Protection**: Built-in rate limiting traversal protection.
 - **Safe Forwarding**: SSRF prevention and signature validation.
 
-## Installation
+## Building from Source
 
 ### Flatpak (Recommended)
-
-[![Get it on Flathub](https://flathub.org/api/badge)](https://flathub.org/en/apps/io.github.tobagin.sonar)
 
 #### Development Version
 ```bash
@@ -72,6 +76,7 @@ meson setup builddir
 meson compile -C builddir
 meson install -C builddir
 ```
+
 
 ## Usage
 
