@@ -43,6 +43,22 @@ template $SonarMainWindow: Adw.ApplicationWindow {
         }
       }
 
+      Adw.Breakpoint {
+        condition ("max-width: 500px")
+
+        setters {
+          header_history_button.visible: false;
+          header_stop_button.visible: false;
+          bottom_action_bar.revealed: true;
+          start_tunnel_container.orientation: vertical;
+          tunnel_controls.orientation: vertical;
+          requests_filter_container.orientation: vertical;
+          requests_search_box.orientation: vertical;
+          history_controls_container.orientation: vertical;
+          history_search_box.orientation: vertical;
+        }
+      }
+
       Adw.Banner status_banner {
         title: _("Tunnel Status");
         button-label: _("Copy URL");
@@ -209,7 +225,7 @@ template $SonarMainWindow: Adw.ApplicationWindow {
               Gtk.Revealer filter_revealer {
                 reveal-child: false;
 
-                child: Gtk.Box {
+                child: Gtk.Box requests_filter_container {
                   orientation: vertical;
                   spacing: 6;
                   margin-start: 6;
@@ -248,7 +264,7 @@ template $SonarMainWindow: Adw.ApplicationWindow {
                     }
                   }
 
-                  Gtk.Box {
+                  Gtk.Box requests_search_box {
                     orientation: horizontal;
                     spacing: 12;
 
@@ -323,7 +339,7 @@ template $SonarMainWindow: Adw.ApplicationWindow {
                   ]
                 }
 
-                Gtk.Box history_controls {
+                Gtk.Box history_controls_container {
                   orientation: horizontal;
                   spacing: 8;
 
@@ -375,7 +391,7 @@ template $SonarMainWindow: Adw.ApplicationWindow {
                 }
               }
 
-              Gtk.Box {
+              Gtk.Box history_search_box {
                 orientation: horizontal;
                 spacing: 12;
                 margin-start: 6;
@@ -393,6 +409,7 @@ template $SonarMainWindow: Adw.ApplicationWindow {
                     "flat",
                   ]
                 }
+
               }
 
               Gtk.ListBox history_list {
@@ -407,6 +424,25 @@ template $SonarMainWindow: Adw.ApplicationWindow {
               }
             };
           };
+        }
+      }
+
+      Gtk.ActionBar bottom_action_bar {
+        revealed: false;
+        
+        [start]
+        Gtk.Button mobile_stop_button {
+          icon-name: "network-offline-symbolic";
+          tooltip-text: _("Stop Tunnel");
+          
+          styles ["flat"]
+        }
+
+        [end]
+        Gtk.Button mobile_history_button {
+            icon-name: "document-open-recent-symbolic";
+            tooltip-text: _("View History");
+             styles ["flat"]
         }
       }
     };

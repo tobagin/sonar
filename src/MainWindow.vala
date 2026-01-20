@@ -53,6 +53,8 @@ namespace Sonar {
         [GtkChild] private unowned Button import_history_button;
         [GtkChild] private unowned Button back_to_requests_button;
         [GtkChild] private unowned ListBox history_list;
+        [GtkChild] private unowned Button mobile_stop_button;
+        [GtkChild] private unowned Button mobile_history_button;
 
         private RequestStorage storage;
         private WebhookServer server;
@@ -119,11 +121,15 @@ namespace Sonar {
             this.setup_token_button.clicked.connect(() => {
                 this._on_setup_token_clicked();
             });
+            this.mobile_stop_button.clicked.connect(() => {
+                this.toggle_tunnel();
+            });
 
             // Button signals
             this.clear_button.clicked.connect(this._on_clear_requests_clicked);
             this.header_history_button.clicked.connect(this._on_history_button_clicked);
             this.history_button.clicked.connect(this._on_history_button_clicked);
+            this.mobile_history_button.clicked.connect(this._on_history_button_clicked);
             this.clear_history_button.clicked.connect(() => {
                 this._show_clear_history_confirmation();
             });
@@ -380,6 +386,8 @@ namespace Sonar {
                 this.status_banner.set_revealed(true);
                 this.start_tunnel_container.set_visible(false);
                 this.stop_tunnel_button.set_visible(true);
+                this.header_stop_button.set_visible(true);
+                this.mobile_stop_button.set_visible(true);
                 this.url_label.set_label(status.public_url);
             } else if (status.error != null) {
                 // Show error in banner
@@ -395,12 +403,16 @@ namespace Sonar {
                 }
                 this.status_banner.set_revealed(true);
                 this.stop_tunnel_button.set_visible(false);
+                this.header_stop_button.set_visible(false);
+                this.mobile_stop_button.set_visible(false);
                 this.url_label.set_label("");
             } else {
                 // Tunnel not running
                 this.status_banner.set_revealed(false);
                 this.start_tunnel_container.set_visible(true);
                 this.stop_tunnel_button.set_visible(false);
+                this.header_stop_button.set_visible(false);
+                this.mobile_stop_button.set_visible(false);
                 this.setup_token_button.set_visible(false);
                 this.url_label.set_label("");
             }

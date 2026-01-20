@@ -149,82 +149,94 @@ template $SonarRequestRow: Adw.ExpanderRow {
     };
   }
 
-  Adw.ActionRow {
-    title: _("Export");
+  Gtk.Box {
+    orientation: vertical;
+    margin-top: 12;
+    margin-bottom: 12;
+    margin-start: 12;
+    margin-end: 12;
+    spacing: 12;
 
-    [prefix]
-    Gtk.Image {
-      icon-name: "document-save-symbolic";
-      valign: center;
-    }
-
-    [suffix]
     Gtk.Box {
       orientation: horizontal;
-      spacing: 6;
+      spacing: 12;
+      
+      Gtk.Image {
+        icon-name: "document-save-symbolic";
+        icon-size: large;
+      }
+      
+      Gtk.Label {
+        label: _("Export");
+        styles ["title-4"]
+      }
+    }
+
+    Gtk.FlowBox {
+      selection-mode: none;
+      max-children-per-line: 10;
+      min-children-per-line: 1;
+      row-spacing: 6;
+      column-spacing: 6;
 
       Gtk.Button copy_curl_button {
         label: _("Copy as cURL");
-        valign: center;
-
-        styles [
-          "suggested-action",
-        ]
+        styles ["suggested-action"]
       }
 
       Gtk.Button copy_http_button {
         label: _("Copy as HTTP");
-        valign: center;
-
-        styles [
-          "flat",
-        ]
+        styles ["flat"]
       }
     }
   }
 
-  Adw.ActionRow {
-    title: _("Actions");
+  Gtk.Box {
+    orientation: vertical;
+    margin-top: 12;
+    margin-bottom: 12;
+    margin-start: 12;
+    margin-end: 12;
+    spacing: 12;
 
-    [prefix]
-    Gtk.Image {
-      icon-name: "media-playback-start-symbolic";
-      valign: center;
-    }
-
-    [suffix]
     Gtk.Box {
       orientation: horizontal;
-      spacing: 6;
+      spacing: 12;
+      
+      Gtk.Image {
+        icon-name: "media-playback-start-symbolic";
+        icon-size: large;
+      }
+
+      Gtk.Label {
+        label: _("Actions");
+        styles ["title-4"]
+      }
+    }
+
+    Gtk.FlowBox {
+      selection-mode: none;
+      max-children-per-line: 10;
+      min-children-per-line: 1;
+      row-spacing: 6;
+      column-spacing: 6;
 
       Gtk.Button replay_button {
         label: _("Replay Request");
         tooltip-text: _("Resend this request to a custom URL");
-        valign: center;
-
-        styles [
-          "flat",
-        ]
+        styles ["flat"]
       }
 
       Gtk.Button compare_button {
         label: _("Select for Comparison");
         tooltip-text: _("Compare with another request");
-        valign: center;
-
-        styles [
-          "flat",
-        ]
+        styles ["flat"]
       }
 
       Gtk.Button save_template_button {
         label: _("Save as Template");
         tooltip-text: _("Save this request as a reusable template");
-        valign: center;
-
-        styles [
-          "suggested-action",
-        ]
+        styles ["suggested-action"]
       }
     }
   }
