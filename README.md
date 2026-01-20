@@ -11,24 +11,14 @@ A modern desktop webhook inspector for developers.
 
 </div>
 
-## 🎉 Version 2.3.2 - Metadata & Docs
+## 🎉 Version 2.4.0 - Mobile Adaptation
 
-**Sonar 2.3.2** brings improvements to packaging metadata and documentation.
+**Sonar 2.4.0** brings full mobile support with a responsive layout.
 
-### ✨ Key Features
+### 🆕 What's New in 2.4.0
 
-- **🔗 Instant Public URLs**: Generate public URLs via ngrok integration for webhook testing
-- **📡 Real-time Capture**: Live display of incoming webhook requests as they arrive
-- **⚖️ Request Comparison**: Side-by-side diff of two webhooks to spot differences
-- **🔒 Secure Storage**: Encrypted credential storage via GNOME Keyring (libsecret)
-- **🎯 Mock Responses**: Configure custom responses for incoming webhooks (New!)
-
-### 🆕 What's New in 2.3.x
-
-- **Metadata**: Branding colors and simplified summary for Flathub.
-- **Docs**: "Get it from Flathub" badge and simplified build instructions.
-- **Mock Responses**: Intercept incoming webhooks (2.3.0).
-- **UI improvements**: High contrast buttons and better layout (2.3.1).
+- **Mobile Adaptation**: Fully responsive layout for mobile devices.
+- **Refined UI**: Improved request list and action buttons.
 
 For detailed release notes and version history, see [CHANGELOG.md](CHANGELOG.md).
 
