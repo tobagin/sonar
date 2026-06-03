@@ -11,14 +11,14 @@ A modern desktop webhook inspector for developers.
 
 </div>
 
-## 🎉 Version 2.4.0 - Mobile Adaptation
+## 🎉 Version 2.5.0 - Dependency & Platform Updates
 
-**Sonar 2.4.0** brings full mobile support with a responsive layout.
+**Sonar 2.5.0** updates the runtime and bundled dependencies.
 
-### 🆕 What's New in 2.4.0
+### 🆕 What's New in 2.5.0
 
-- **Mobile Adaptation**: Fully responsive layout for mobile devices.
-- **Refined UI**: Improved request list and action buttons.
+- **GNOME 50 Runtime**: Updated to the latest GNOME Platform/SDK.
+- **Refreshed Dependencies**: Updated the bundled ngrok binary to the latest stable release.
 
 For detailed release notes and version history, see [CHANGELOG.md](CHANGELOG.md).
 

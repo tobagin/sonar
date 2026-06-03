@@ -90,6 +90,16 @@
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
 
   <releases>
+    <release version="2.5.0" date="2026-06-03">
+      <description>
+        <p>🔧 Dependency &amp; Platform Updates</p>
+        <p>Changes:</p>
+        <ul>
+          <li>Updated to the GNOME 50 runtime</li>
+          <li>Refreshed the bundled ngrok binary to the latest stable release</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.4.0" date="2026-01-20">
       <description>
         <p>📱 Mobile Adaptation &amp; UI Refinements</p>

@@ -1,6 +1,6 @@
 app-id: io.github.tobagin.sonar
 runtime: org.gnome.Platform
-runtime-version: '49'
+runtime-version: '50'
 sdk: org.gnome.Sdk
 command: sonar
 finish-args:
@@ -44,12 +44,12 @@ modules:
     sources:
       - type: file
         url: https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
-        sha256: 8cbaf02b3f9b3c118acf5bd3075b2668151031c158cb458b79a68c3b14ed34e8
+        sha256: 6efc7d5b055af19957a1667bc4c7a08fde931858e122a4c2c8dece4766458d61
         dest-filename: ngrok.tgz
         only-arches: [x86_64]
       - type: file
         url: https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm64.tgz
-        sha256: 10509202894c6e005bc62a3fb4fcee19addeac57cd490a33d3af7c847b5dd0d8
+        sha256: dbb22df857a6fd827c7b5b2023e552de97a3715af0521833b8e4719c54bd2904
         dest-filename: ngrok.tgz
         only-arches: [aarch64]
 
@@ -58,5 +58,5 @@ modules:
     sources:
       - type: git
         url: https://github.com/tobagin/Sonar.git
-        tag: v2.2.0
-        commit: ba91bcd713a08236c11942554dfa76e9f2315373
+        tag: v2.5.0
+        commit: TAG_COMMIT_PLACEHOLDER
