@@ -1,6 +1,6 @@
 app-id: io.github.tobagin.sonar.Devel
 runtime: org.gnome.Platform
-runtime-version: '50'
+runtime-version: '51'
 sdk: org.gnome.Sdk
 command: sonar
 finish-args:
@@ -33,8 +33,8 @@ modules:
     sources:
       - type: git
         url: https://gitlab.gnome.org/GNOME/libsecret.git
-        tag: 0.21.7
-        commit: 0936f740c02b60f02657729cd99f581db4517a41
+        tag: 0.21.8
+        commit: 9e52f6ae1c74dba683fb4793d349c26d4c1115b8
 
   - name: ngrok
     buildsystem: simple
@@ -44,12 +44,12 @@ modules:
     sources:
       - type: file
         url: https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
-        sha256: 6efc7d5b055af19957a1667bc4c7a08fde931858e122a4c2c8dece4766458d61
+        sha256: cec0b4997fcc5f529dfc74bac89050354d11a915f968720600039738fdf330cf
         dest-filename: ngrok.tgz
         only-arches: [x86_64]
       - type: file
         url: https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm64.tgz
-        sha256: dbb22df857a6fd827c7b5b2023e552de97a3715af0521833b8e4719c54bd2904
+        sha256: 3b6ba05a9d9585c34157fa0819fa95cdb13839f5b506b9e63204705cf7f79e29
         dest-filename: ngrok.tgz
         only-arches: [aarch64]
 

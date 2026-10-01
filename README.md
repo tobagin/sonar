@@ -11,14 +11,14 @@ A modern desktop webhook inspector for developers.
 
 </div>
 
-## 🎉 Version 2.5.0 - Dependency & Platform Updates
+## 🎉 Version 2.6.0 - Dependency & Platform Updates
 
-**Sonar 2.5.0** updates the runtime and bundled dependencies.
+**Sonar 2.6.0** updates the runtime and bundled dependencies.
 
-### 🆕 What's New in 2.5.0
+### 🆕 What's New in 2.6.0
 
-- **GNOME 50 Runtime**: Updated to the latest GNOME Platform/SDK.
-- **Refreshed Dependencies**: Updated the bundled ngrok binary to the latest stable release.
+- **GNOME 51 Runtime**: Updated to the latest GNOME Platform/SDK.
+- **Refreshed Dependencies**: Updated libsecret to 0.21.8 and the bundled ngrok binary to 3.39.11.
 
 For detailed release notes and version history, see [CHANGELOG.md](CHANGELOG.md).
 
